@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing App</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.slim.js"
+        integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<h1>Welcome to the Drawing App!</h1>
+<div class= "container">
+
+    <div class="color-container">
+
+        <button class="btn btn-black" type="button"></button>
+        <button class="btn btn-red" type="button"></button>
+        <button class="btn btn-orange" type="button"></button>
+        <button class="btn btn-yellow" type="button"></button>
+        <button class="btn btn-green" type="button"></button>
+        <button class="btn btn-blue" type="button"></button>
+        <button class="btn btn-purple" type="button"></button>
+        <button class="btn btn-pink" type="button"></button>
+        <button class="btn btn-brown" type="button"></button>
+        <button class="btn btn-grey" type="button"></button>
+        
+    
+    </div>
+<!--
+    <canvas id="canvas" width="700" height="500" 
+        style="border: 2px solid lime; display: block;"></canvas>
+-->
+    <div id="stage">
+        <canvas width="700" height="500" id="main"></canvas>
+        <canvas width="700" height="500" id="model"></canvas>
+        <canvas width="700" height="500" id="trace"></canvas>
+    </div>
+
+</div>
+
+<div class="toolbar-container">
+    <div class="shapes">
+        <button id="circle" class="btn btn-circle" type="button"></button>
+        <button id="square" class="btn btn-square" type="button"></button>
+    </div>
+    
+    <div class="actions">
+        <button id="clear" class="btn-clear" type="button">Clear</button>
+    </div>
+</div>
+
+<div class="tracer-display">
+    <div class="tracer-position">
+        <label for="x">x: </label>
+        <input type="text" name="x" size="5"></input>
+    </div>
+    <div class="tracer-position">
+        <label for="y">y: </label>
+        <input type="text" name="y" size="5"></input>
+    </div>
+</div>
+
+<script src="shape.js"></script>
+<script src="dispatcher.js"></script>
+<script src="canvas.js"></script>
+<script src="stage.js"></script>
+
+<script>
+
+    var stage = new Stage(
+        $("#stage").find("#main").get(0), 
+        $("#stage").find("#model").get(0), 
+        $("#stage").find("#trace").get(0));
+
+    var dispatcher = new Dispatcher(stage);
+    var shape = new Shape();
+    var color = undefined;
+
+    $(document).ready(function() {
+        /**
+         * For each color button attach click handler:
+         * onClick make button's width wider, so that it was seen that
+         * the color-button has been clicked.
+         */
+        $.each($('.color-container').find(".btn"), (index, button) => {
+            $(button).on("click", function() {
+                $.each($('.color-container').find(".btn"), (index, button) => { 
+                    if ($(this).attr("class") == $(button).attr("class")) {
+                        $(button).css("width", "40px");
+                        color = $(button).css("background-color");
+                        shape.setColor(color);
+                    } else {
+                        $(button).css("width", "30px");
+                    }
+                });
+
+            });
+        });
+
+        /**
+         * Trigger clisk event at black=color button, 
+         * to pick black color as default.
+         */
+        $('.color-container').find(".btn.btn-black").click();
+       
+        /**
+         * Even handlers for shape-buttons
+         */
+        $("#circle").on("click", function(event) {
+            shape = new Circle();
+            shape.setColor(color);
+        });
+
+        $("#square").on("click", function(event){
+            shape = new Rectangle();
+            shape.setColor(color);
+        });
+
+        $("#clear").on("click", function(event){
+            stage.clear();
+        });
+    
+        /**
+         * Trace the mouse pointer and process its click
+         */
+        $("#trace").bind("mousemove click", function(event) {
+            dispatcher.dispatch(event, shape);
+        });
+
+    });
+</script>
+
+</body>
+</html>

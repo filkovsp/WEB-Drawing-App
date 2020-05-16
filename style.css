@@ -1,0 +1,118 @@
+.container{
+    display: flex;
+}
+
+.color-container {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.btn{
+    width: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: #ccc;
+}
+
+.btn-red{
+    background-color: red;
+}
+
+.btn-orange{
+    background-color: orange;
+}
+
+.btn-yellow{
+    background-color: yellow;
+}
+
+.btn-green{
+    background-color: green;
+}
+
+.btn-blue{
+    background-color: blue;
+}
+
+.btn-purple{
+    background-color: purple;
+}
+
+.btn-pink{
+    background-color: palevioletred;
+}
+
+.btn-brown{
+    background-color: brown;
+}
+
+.btn-grey{
+    background-color: grey;
+}
+
+.btn-black{
+    background-color: black;
+}
+
+.toolbar-container {
+    margin-top: 10px;
+    width: 750px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shapes {
+    margin-left: 50px;
+}
+
+.btn-circle {
+    border: 2px solid #444;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.btn-square {
+    border: 2px solid #444;
+    cursor: pointer;
+}
+
+.btn-clear{
+    cursor: pointer;
+    padding:5px 15px;
+}
+
+.tracer-display {
+    margin-left: 50px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: row;
+    width: 700px;
+}
+
+.tracer-position {
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+}
+
+#stage {
+    position: relative;
+    border: 1px solid lime;
+    width: 700px;
+    height: 500px;
+}
+
+#stage > canvas { 
+    position: absolute;
+    background: transparent;
+    opacity: 1.0;
+}
+
+#main  { z-index: 1; }
+#model { z-index: 2; }
+#trace { z-index: 3; }
+
