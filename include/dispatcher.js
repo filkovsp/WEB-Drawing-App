@@ -15,22 +15,27 @@ class Dispatcher {
     }
 
     /**
-     * init() - it an internal method, not supposed to be called from outside, for now.
+     * init() - This is an internal method, not supposed to be called from outside, for now.
      */
     init() {
+        // Set initial values for the coordinates:
         this.x = 0; 
         this.y = 0;
         this.start = {x: 0, y:0};
         this.end = {x: 0, y: 0};
         this.clickCount = 0;
+        // Set tracing line color to red-ish.
         this.tracer.setColor("rgb(150, 0, 0)");
+        // Decorate line styles for tarcing and modelling layers:
+        this.stage.trace.context.setLineDash([1, 3]);
+        this.stage.model.context.setLineDash([1, 2]);
     }
 
     /**
      * dispatch() - is the only method that should be use from outside, by the client of this class.
      * The rest of methods in Dispatcher are for internal use only.
-     * @param {*} event 
-     * @param {*} shape 
+     * @param {Object} event 
+     * @param {Object} shape 
      */
     dispatch(event, shape) {
         this.x = event.clientX - event.target.parentElement.offsetLeft;

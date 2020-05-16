@@ -50,11 +50,12 @@ class Circle extends Shape {
         super();
     }
 
+    /**
+     * Draws Circle with center at props{x, y} and radius props{r}
+     * @param {Canvas} layer Canvas object, where the shape must be drawn
+     * @param {Object} pops Object containing properties {x, y, r}
+     */
     draw(layer, pops) {
-        /**
-         * TODO:
-         * use ellipse() instead of arc()
-         */
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
         layer.context.arc(pops.x, pops.y, pops.r, 0, 2*Math.PI);
@@ -72,6 +73,11 @@ class Circle extends Shape {
     }
 }
 
+/**
+ * TODO:
+ * Add class Ellipse
+ * that uses context.ellipse() method
+ */
 
 class Rectangle extends Shape {
     constructor() {
@@ -79,11 +85,9 @@ class Rectangle extends Shape {
     }
 
     /**
-     * Draws Rectangle.
-     * takes params:
-     * @param {*} canvas : target canvas object, where the shape must be drawn
-     * @param {*} props : {x, y, w, h} - object containing coordinates of the starting point {x, y} 
-     * and additional width (w) and height (h).
+     * Draws Rectangle, with starting top-left coner at props{x, y}, width and height as props{w, h}
+     * @param {Canvas} canvas Canvas object, where the shape must be drawn
+     * @param {Object} props Object containing properties {x, y, w, h}
      */
     draw(layer, props) {
         /**
@@ -93,7 +97,6 @@ class Rectangle extends Shape {
          * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeRect
          */
         layer.context.strokeStyle = this.color;
-        layer.context.fillStyle = this.fillColor;
         layer.context.beginPath();
         layer.context.moveTo(props.x, props.y);
         layer.context.lineTo(props.x + props.w, props.y);
@@ -118,6 +121,12 @@ class Trace extends Shape {
         super();
     }
     
+    /**
+     * Draws vertical and horizontal lines over the whole canvas,
+     * crossed at position: props{x, y}
+     * @param {Canvas} layer Canvas object, where the shape must be drawn
+     * @param {Object} props Object containing properties {x, y}
+     */
     draw(layer, props) {
         layer.context.beginPath();
         layer.context.strokeStyle = this.color;

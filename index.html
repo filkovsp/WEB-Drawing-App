@@ -128,7 +128,7 @@
         /**
          * Trace the mouse pointer and process its click
          */
-        $("#trace").bind("mousemove click", function(event) {
+        $("#trace").bind("mousemove touchmove click", function(event) {
             dispatcher.dispatch(event, shape);
         });
 
