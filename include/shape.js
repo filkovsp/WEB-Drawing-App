@@ -24,7 +24,10 @@ class Shape {
         this.fillColor = color;
     }
 
-    getCoordinates({start, end}) {
+    /**
+     * coordinates = {start: {x, y}, end: {x, y}};
+     */
+    getPropsFromCoordinates({start, end}) {
         alert("implement this method in Child class");
     }
 
@@ -57,6 +60,16 @@ class Circle extends Shape {
         layer.context.arc(pops.x, pops.y, pops.r, 0, 2*Math.PI);
         layer.context.stroke();           
     }
+
+    getPropsFromCoordinates(coordinates) {
+        return {
+            x:coordinates.start.x, 
+            y:coordinates.start.y, 
+            r:Math.sqrt(
+                Math.pow(coordinates.end.x - coordinates.start.x, 2) + 
+                Math.pow(coordinates.end.y - coordinates.start.y, 2)
+            )};
+    }
 }
 
 
@@ -88,6 +101,14 @@ class Rectangle extends Shape {
         layer.context.lineTo(props.x, props.y + props.h);
         layer.context.lineTo(props.x, props.y);
         layer.context.stroke();
+    }
+
+    getPropsFromCoordinates(coordinates) {
+        return {
+            x:coordinates.start.x, 
+            y:coordinates.start.y, 
+            w:(coordinates.end.x - coordinates.start.x),
+            h:(coordinates.end.y - coordinates.start.y)};
     }
 }
 

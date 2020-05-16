@@ -17,7 +17,8 @@ class Stage {
     }
 
     init() {
-        // tracing layer must be semi-tranparent
+        // tracing and modelling layers must be semi-tranparent:
+        this.model.context.globalAlpha = 0.6;
         this.trace.context.globalAlpha = 0.3;
     }
 

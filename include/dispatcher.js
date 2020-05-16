@@ -36,11 +36,7 @@ class Dispatcher {
         this.x = event.clientX - event.target.parentElement.offsetLeft;
         this.y = event.clientY - event.target.parentElement.offsetTop;
 
-        if (event.type == "mousemove") {
-            
-            this.trace(event);
-
-        } else if (event.type == "click" ) {
+        if (event.type == "click" ) {
             
             if(this.clickCount == 0) {
                 this.start.x = event.clientX - event.target.parentElement.offsetLeft;
@@ -50,46 +46,21 @@ class Dispatcher {
                 this.end.x = event.clientX - event.target.parentElement.offsetLeft;
                 this.end.y = event.clientY - event.target.parentElement.offsetTop;
                 this.clickCount = 0;
-            }
-            
-            /**
-             * TODO:
-             * - process "click" even properly so that "shape modelling" worked as supposed to.
-             * 
-             * - re-work Shape-classes so that they would receive in props two coordinates {x, y}
-             *      for two clicks - start and end of the modelling.
-             *      shape must calculated rest of the drawing parameters by itself, 
-             *      based on "start" and "end" click-points.
-             */
-            this.draw(event, shape, this.stage.main);
 
+                this.stage.model.clear();
+                this.stage.main.draw(shape, shape.getPropsFromCoordinates({start:this.start, end:this.end}));
+            }
+        } else if (event.type == "mousemove") {
+            this.trace(event);
+            if(this.clickCount > 0) {
+                this.stage.model.clear();
+                this.stage.model.draw(shape, shape.getPropsFromCoordinates({start:this.start, end:{x:this.x, y:this.y}}));
+            }
         }
 
-        return false;
+        return true;
     }
     
-    /**
-     * draw() - it an internal method, not supposed to be called from outside, for now.
-     * @param {*} event 
-     * @param {*} shape 
-     */
-    draw(event, shape, layer) {
-        
-        switch(shape.constructor.name) {
-            case "Circle":
-                layer.draw(shape, {x:this.x, y:this.y, r:10});
-                break;
-            case "Rectangle":
-                layer.draw(shape, {x:this.x, y:this.y, w:50, h:50});
-                break;
-            default:
-                alert("Choose the shape!");
-                break;
-        }
-
-        return null;
-    }
-
     /**
      * trace() - it an internal method, not supposed to be called from outside, for now.
      * @param {*} event 
@@ -99,6 +70,6 @@ class Dispatcher {
         $("input[name='y']").val(this.y);
         this.stage.trace.clear();
         this.stage.trace.draw(this.tracer, {x: this.x, y: this.y});
-        
+        return true;
     }
 }
