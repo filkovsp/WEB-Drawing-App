@@ -25,14 +25,16 @@ class Shape {
     }
 
     /**
-     * coordinates = {start: {x, y}, end: {x, y}};
+     * Shape specific method that returns object of properties required by shape to draw
+     * out of two coordinates at the canvas: starting and ending points.
+     * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
     getPropsFromCoordinates({start, end}) {
-        alert("implement this method in Child class");
+        throw new Error("implement this method in Child class");
     }
 
     draw() {
-        alert("Choose the Shape!");
+        throw new Error("Choose the Shape!");
     }
 
     /**
@@ -53,15 +55,20 @@ class Circle extends Shape {
     /**
      * Draws Circle with center at props{x, y} and radius props{r}
      * @param {Canvas} layer Canvas object, where the shape must be drawn
-     * @param {Object} pops Object containing properties {x, y, r}
+     * @param {Object} props Object containing properties {x, y, r}
      */
-    draw(layer, pops) {
+    draw(layer, props) {
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
-        layer.context.arc(pops.x, pops.y, pops.r, 0, 2*Math.PI);
+        layer.context.arc(props.x, props.y, props.r, 0, 2*Math.PI);
         layer.context.stroke();           
     }
 
+    /**
+     * Shape specific method that returns object of properties required by shape to draw
+     * out of two coordinates at the canvas: starting and ending points.
+     * @param {Object} coordinates {start: {x, y}, end: {x, y}}
+     */
     getPropsFromCoordinates(coordinates) {
         return {
             x:coordinates.start.x, 
@@ -78,6 +85,50 @@ class Circle extends Shape {
  * Add class Ellipse
  * that uses context.ellipse() method
  */
+class Ellipse extends Shape {
+    constructor() {
+        super();
+    }
+    
+    /**
+     * Draws Ellipse
+     * @param {Canvas} layer 
+     * @param {Object} props Object containing properties {x, y, rX, rY, rA}
+     */
+    draw(layer, props) {
+        layer.context.strokeStyle = this.color;
+        layer.context.beginPath();
+        layer.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2*Math.PI);
+        layer.context.stroke();  
+    }
+
+    /**
+     * Shape specific method that returns object of properties required by shape to draw
+     * out of two coordinates at the canvas: starting and ending points.
+     * @param {Object} coordinates {start: {x, y}, end: {x, y}}
+     */
+    getPropsFromCoordinates(coordinates) {
+        /**
+         * TODO: rework this functio to make it calculating props more properly.
+         */
+        let hyp = Math.sqrt(
+            Math.pow(coordinates.end.x - coordinates.start.x, 2) + 
+            Math.pow(coordinates.end.y - coordinates.start.y, 2)
+        );
+
+        let adj = Math.abs(
+            coordinates.end.y - coordinates.start.y
+        );
+        
+        return {
+            x: coordinates.start.x, 
+            y: coordinates.start.y, 
+            rX: Math.abs(coordinates.end.x - coordinates.start.x),
+            rY: Math.abs(coordinates.end.y - coordinates.start.y),
+            rA: Math.acos(adj/hyp)
+        };
+    }
+}
 
 class Rectangle extends Shape {
     constructor() {
@@ -106,6 +157,10 @@ class Rectangle extends Shape {
         layer.context.stroke();
     }
 
+    /**
+     * 
+     * @param {Object} coordinates 
+     */
     getPropsFromCoordinates(coordinates) {
         return {
             x:coordinates.start.x, 

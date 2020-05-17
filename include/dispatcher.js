@@ -24,11 +24,9 @@ class Dispatcher {
         this.start = {x: 0, y:0};
         this.end = {x: 0, y: 0};
         this.clickCount = 0;
+        
         // Set tracing line color to red-ish.
         this.tracer.setColor("rgb(150, 0, 0)");
-        // Decorate line styles for tarcing and modelling layers:
-        this.stage.trace.context.setLineDash([1, 3]);
-        this.stage.model.context.setLineDash([1, 2]);
     }
 
     /**
@@ -40,8 +38,17 @@ class Dispatcher {
     dispatch(event, shape) {
         this.x = event.clientX - event.target.parentElement.offsetLeft;
         this.y = event.clientY - event.target.parentElement.offsetTop;
+        this.trace(event);
 
-        if (event.type == "click" ) {
+        /**
+         * TODO:
+         * implement the logic below with Observer pattern.
+         */
+        if (event.type == "click" && shape.constructor.name == "Shape") {
+        
+            alert("Pick a Shape from the tool bar!");
+        
+        } else if (event.type == "click") {
             
             if(this.clickCount == 0) {
                 this.start.x = event.clientX - event.target.parentElement.offsetLeft;
@@ -56,13 +63,13 @@ class Dispatcher {
                 this.stage.main.draw(shape, shape.getPropsFromCoordinates({start:this.start, end:this.end}));
             }
         } else if (event.type == "mousemove") {
-            this.trace(event);
             if(this.clickCount > 0) {
                 this.stage.model.clear();
                 this.stage.model.draw(shape, shape.getPropsFromCoordinates({start:this.start, end:{x:this.x, y:this.y}}));
             }
-        }
-
+        } 
+        
+        // Optional return. Just to let the client that method has worked fine.
         return true;
     }
     
@@ -75,6 +82,8 @@ class Dispatcher {
         $("input[name='y']").val(this.y);
         this.stage.trace.clear();
         this.stage.trace.draw(this.tracer, {x: this.x, y: this.y});
+        
+        // Optional return. Just to let the client that method has worked fine.
         return true;
     }
 }

@@ -45,8 +45,9 @@
 
 <div class="toolbar-container">
     <div class="shapes">
-        <button id="circle" class="btn btn-circle" type="button"></button>
-        <button id="square" class="btn btn-square" type="button"></button>
+        <button id="circle" class="btn btn-circle" type="button" title="Circle"></button>
+        <button id="ellipse" class="btn btn-ellipse" type="button" title="Ellipse"></button>
+        <button id="square" class="btn btn-square" type="button" title="Rectangle"></button>
     </div>
     
     <div class="actions">
@@ -113,6 +114,11 @@
          */
         $("#circle").on("click", function(event) {
             shape = new Circle();
+            shape.setColor(color);
+        });
+
+        $("#ellipse").on("click", function(event){
+            shape = new Ellipse();
             shape.setColor(color);
         });
 

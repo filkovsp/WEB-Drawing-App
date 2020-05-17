@@ -18,8 +18,13 @@ class Stage {
 
     init() {
         // tracing and modelling layers must be semi-tranparent:
-        this.model.context.globalAlpha = 0.6;
         this.trace.context.globalAlpha = 0.3;
+        this.model.context.globalAlpha = 0.6;
+          
+        // Decorate line styles for tarcing and modelling layers:
+        this.trace.context.setLineDash([1, 3]);
+        this.model.context.setLineDash([1, 2]);
+
     }
 
     clear() {
