@@ -42,6 +42,7 @@ class Dispatcher {
 
         /**
          * TODO:
+         * implement keypress event handler, for ESC key to cancel shape modelling. https://api.jquery.com/keypress/
          * implement the logic below with Observer pattern.
          */
         if (event.type == "click" && shape.constructor.name == "Shape") {
@@ -64,7 +65,11 @@ class Dispatcher {
                 this.stage.model.clear();
                 this.stage.model.draw(shape, shape.getPropsFromCoordinates({start:this.start, end:{x:this.x, y:this.y}}));
             }
-        } 
+        } else if (event.type === "keyup" && event.key === "Escape") {
+            this.init();
+            this.stage.model.clear();
+            return;
+        }
         
         // Optional return. Just to let the client know that method has worked fine.
         return true;

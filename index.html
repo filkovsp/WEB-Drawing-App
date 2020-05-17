@@ -138,6 +138,16 @@
             dispatcher.dispatch(event, shape);
         });
 
+        /**
+         * Trace ESC key-up event
+         */
+        $(document).bind("keyup", function(event) {
+            if (event.key === "Escape") {
+                dispatcher.dispatch(event, shape);
+                // alert("ESC key pressed");
+            }
+        });
+
     });
 </script>
 
