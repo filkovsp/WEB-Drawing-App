@@ -15,7 +15,7 @@ class Dispatcher {
     }
 
     /**
-     * init() - This is an internal method, not supposed to be called from outside, for now.
+     * This is an internal method, not supposed to be called from outside, for now.
      */
     init() {
         // Set initial values for the coordinates:
@@ -30,7 +30,7 @@ class Dispatcher {
     }
 
     /**
-     * dispatch() - is the only method that should be use from outside, by the client of this class.
+     * This is the only method that should be used from outside, by the client of this class.
      * The rest of methods in Dispatcher are for internal use only.
      * @param {Object} event 
      * @param {Object} shape 
@@ -45,11 +45,8 @@ class Dispatcher {
          * implement the logic below with Observer pattern.
          */
         if (event.type == "click" && shape.constructor.name == "Shape") {
-        
             alert("Pick a Shape from the tool bar!");
-        
-        } else if (event.type == "click") {
-            
+        } else if (event.type == "click") {        
             if(this.clickCount == 0) {
                 this.start.x = event.clientX - event.target.parentElement.offsetLeft;
                 this.start.y = event.clientY - event.target.parentElement.offsetTop;
@@ -69,13 +66,13 @@ class Dispatcher {
             }
         } 
         
-        // Optional return. Just to let the client that method has worked fine.
+        // Optional return. Just to let the client know that method has worked fine.
         return true;
     }
     
     /**
      * trace() - it an internal method, not supposed to be called from outside, for now.
-     * @param {*} event 
+     * @param {Object} event Mouse Event object (optional)
      */
     trace(event) {
         $("input[name='x']").val(this.x);
@@ -83,7 +80,7 @@ class Dispatcher {
         this.stage.trace.clear();
         this.stage.trace.draw(this.tracer, {x: this.x, y: this.y});
         
-        // Optional return. Just to let the client that method has worked fine.
+        // Optional return. Just to let the client know that method has worked fine.
         return true;
     }
 }

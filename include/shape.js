@@ -6,6 +6,11 @@
  * https://www.khanacademy.org/computing/computer-programming/programming/drawing-basics/pc/challenge-waving-snowman
  * follow the Documentation tab at the bottom.
  */
+
+/**
+ * Shape is an Abstract Class, should not be instanciated directly.
+ * But one of the clases below that extend Shape must be used for drawing a particular shape.
+ */
 class Shape {
     constructor() {
         this.color = "rgb(0, 0, 0)";
@@ -13,6 +18,7 @@ class Shape {
     }
     
     /**
+     * Interface to set Shape's line-color property
      * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors
      * @param {*} color 
      */
@@ -20,26 +26,37 @@ class Shape {
         this.color = color;
     }
 
+    /**
+     * Interface to set Shape's fill-color property
+     * @param {*} color 
+     */
     setFillColor(color) {
         this.fillColor = color;
     }
 
     /**
-     * Shape specific method that returns object of properties required by shape to draw
-     * out of two coordinates at the canvas: starting and ending points.
+     * Interface for the Shape's specific method that returns object of properties 
+     * required by shape to draw it out of two coordinates at the canvas: 
+     * starting and ending points.
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
     getPropsFromCoordinates({start, end}) {
         throw new Error("implement this method in Child class");
     }
 
-    draw() {
+    /**
+     * Interface to the Shape's Draw mathod.
+     * Draws the Shape on the canvas with the given coordinates in props
+     * @param {Canvas} canvas 
+     * @param {Object} props 
+     */
+    draw(canvas, props) {
         throw new Error("Choose the Shape!");
     }
 
     /**
      * TODO:
-     * implement interface for a method to set line-width:
+     * Add interface for a method to set line-width:
      * usage: context.lineWidth = 1;
      * refer to the Context-API: 
      * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineWidth
@@ -54,14 +71,14 @@ class Circle extends Shape {
 
     /**
      * Draws Circle with center at props{x, y} and radius props{r}
-     * @param {Canvas} layer Canvas object, where the shape must be drawn
+     * @param {Canvas} canvas Canvas object, where the shape must be drawn
      * @param {Object} props Object containing properties {x, y, r}
      */
-    draw(layer, props) {
-        layer.context.strokeStyle = this.color;
-        layer.context.beginPath();
-        layer.context.arc(props.x, props.y, props.r, 0, 2*Math.PI);
-        layer.context.stroke();           
+    draw(canvas, props) {
+        canvas.context.strokeStyle = this.color;
+        canvas.context.beginPath();
+        canvas.context.arc(props.x, props.y, props.r, 0, 2*Math.PI);
+        canvas.context.stroke();           
     }
 
     /**
@@ -92,14 +109,14 @@ class Ellipse extends Shape {
     
     /**
      * Draws Ellipse
-     * @param {Canvas} layer 
+     * @param {Canvas} canvas 
      * @param {Object} props Object containing properties {x, y, rX, rY, rA}
      */
-    draw(layer, props) {
-        layer.context.strokeStyle = this.color;
-        layer.context.beginPath();
-        layer.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2*Math.PI);
-        layer.context.stroke();  
+    draw(canvas, props) {
+        canvas.context.strokeStyle = this.color;
+        canvas.context.beginPath();
+        canvas.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2*Math.PI);
+        canvas.context.stroke();  
     }
 
     /**
@@ -140,21 +157,21 @@ class Rectangle extends Shape {
      * @param {Canvas} canvas Canvas object, where the shape must be drawn
      * @param {Object} props Object containing properties {x, y, w, h}
      */
-    draw(layer, props) {
+    draw(canvas, props) {
         /**
          * TODO:
          * consider using context.strokeRect() instead.
          * refer fo Context-API:
          * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeRect
          */
-        layer.context.strokeStyle = this.color;
-        layer.context.beginPath();
-        layer.context.moveTo(props.x, props.y);
-        layer.context.lineTo(props.x + props.w, props.y);
-        layer.context.lineTo(props.x + props.w, props.y + props.h);
-        layer.context.lineTo(props.x, props.y + props.h);
-        layer.context.lineTo(props.x, props.y);
-        layer.context.stroke();
+        canvas.context.strokeStyle = this.color;
+        canvas.context.beginPath();
+        canvas.context.moveTo(props.x, props.y);
+        canvas.context.lineTo(props.x + props.w, props.y);
+        canvas.context.lineTo(props.x + props.w, props.y + props.h);
+        canvas.context.lineTo(props.x, props.y + props.h);
+        canvas.context.lineTo(props.x, props.y);
+        canvas.context.stroke();
     }
 
     /**
@@ -179,16 +196,16 @@ class Trace extends Shape {
     /**
      * Draws vertical and horizontal lines over the whole canvas,
      * crossed at position: props{x, y}
-     * @param {Canvas} layer Canvas object, where the shape must be drawn
+     * @param {Canvas} canvas Canvas object, where the shape must be drawn
      * @param {Object} props Object containing properties {x, y}
      */
-    draw(layer, props) {
-        layer.context.beginPath();
-        layer.context.strokeStyle = this.color;
-        layer.context.moveTo(props.x, 0);
-        layer.context.lineTo(props.x, layer.view.height);
-        layer.context.moveTo(0, props.y);
-        layer.context.lineTo(layer.view.width, props.y);
-        layer.context.stroke();
+    draw(canvas, props) {
+        canvas.context.beginPath();
+        canvas.context.strokeStyle = this.color;
+        canvas.context.moveTo(props.x, 0);
+        canvas.context.lineTo(props.x, canvas.view.height);
+        canvas.context.moveTo(0, props.y);
+        canvas.context.lineTo(canvas.view.width, props.y);
+        canvas.context.stroke();
     }
 }
