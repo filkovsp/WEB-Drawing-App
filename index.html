@@ -93,10 +93,28 @@
                 $.each($('.color-container').find(".btn"), (index, button) => { 
                     if ($(this).attr("class") == $(button).attr("class")) {
                         $(button).css("width", "40px");
+                        $(button).blur();
                         color = $(button).css("background-color");
                         shape.setColor(color);
                     } else {
                         $(button).css("width", "30px");
+                    }
+                });
+
+            });
+        });
+
+        /**
+         * box-shadow decoration for the selected shape button:
+         */
+        $.each($('.shapes').find(".btn"), (index, button) => { 
+            $(button).on("click", function() {
+                $.each($('.shapes').find(".btn"), (index, button) => {
+                    if ($(this).attr("id") == $(button).attr("id")) {
+                        $(button).css("box-shadow", "0 0 1px #51abff, 0 0 2px #51abff, 0 0 6px #51abff, 0 0 12px #51abff");
+                        $(button).blur();
+                    } else {
+                        $(button).css("box-shadow", "");
                     }
                 });
 
