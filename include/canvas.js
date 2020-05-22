@@ -9,8 +9,12 @@ class Canvas {
         this.context = canvas.getContext('2d');
     }
 
-    clear() {
-        this.context.clearRect(0, 0, this.view.width, this.view.height);
+    clear(props) {
+        if (typeof(props) === "object" && ["x", "y", "w", "h"].every(key => props.hasOwnProperty(key))) {
+            this.context.clearRect(props.x, props.y, props.w, props.h);
+        } else {
+            this.context.clearRect(0, 0, this.view.width, this.view.height);
+        }
     }
 
     draw(shape, props) {
