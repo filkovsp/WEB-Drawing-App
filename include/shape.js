@@ -36,7 +36,7 @@ class Shape {
 
     /**
      * Interface for the Shape's specific method that returns object of properties 
-     * required by shape to draw it out of two coordinates at the canvas: 
+     * required by shape to draw it out of two coordinates at the layer: 
      * starting and ending points.
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
@@ -45,13 +45,33 @@ class Shape {
     }
 
     /**
+     * Method that validates
+     * whether we receive in props just to points {start: {x, y}, end: {x, y}}
+     * or, this is shape-speciwic params for drawing particular shape.
+     * I you use this method in CHild class, then make sure you implement also
+     * getPropsFromCoordinates() in the same class.
+     * @param {*} props 
+     */
+    validateProps(props) {
+        // if (typeof(props) === "object" && ["start", "end", "offset"].some(key => props.hasOwnProperty(key))) {
+        if (["start", "end"].some(key => Object.keys(props).includes(key))) {
+            return this.getPropsFromCoordinates(props);
+        }
+        return props;
+    }
+
+    /**
      * Interface to the Shape's Draw mathod.
-     * Draws the Shape on the canvas with the given coordinates in props
-     * @param {Canvas} canvas 
+     * Draws the Shape on the layer with the given coordinates in props
+     * @param {Layer} layer
      * @param {Object} props 
      */
-    draw(canvas, props) {
+    draw(layer, props) {
         throw new Error("Choose the Shape!");
+    }
+
+    clone() {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
     }
 
     /**
@@ -64,44 +84,65 @@ class Shape {
      */
 }
 
+/**************************************************************************
+ * Set of concrete classes below 
+ * that each reperesents a perticular shape on a layer.
+ -------------------------------------------------------------------------*/
 class Circle extends Shape {
     constructor() {
         super();
-    }
+    }    
 
     /**
      * Draws Circle with center at props{x, y} and radius props{r}
-     * @param {Canvas} canvas Canvas object, where the shape must be drawn
+     * @param {Layer} layer The oject, where the shape must be drawn
      * @param {Object} props Object containing properties {x, y, r}
      */
-    draw(canvas, props) {
-        canvas.context.strokeStyle = this.color;
-        canvas.context.beginPath();
-        canvas.context.arc(props.x, props.y, props.r, 0, 2*Math.PI);
-        canvas.context.stroke();           
+    draw(layer, props) {
+        if(!["x", "y", "r"].every(property => Object.keys(props).includes(property))) {
+            props = this.validateProps(props);    
+        }
+
+        layer.context.strokeStyle = this.color;
+        layer.context.beginPath();
+        layer.context.arc(props.x, props.y, props.r, 0, 2 * Math.PI);
+        layer.context.closePath();
+        layer.context.stroke();
+        
+        // ammend shape's (x,y) coordinates 
+        // with consideration current Layer's offset
+        props.x -= props.offset.x;
+        props.y -= props.offset.y;
+        
+        // drop default properties.
+        delete props.offset;
+        delete props.start;
+        delete props.end;
+        return props;
     }
 
     /**
      * Shape specific method that returns object of properties required by shape to draw
-     * out of two coordinates at the canvas: starting and ending points.
-     * @param {Object} coordinates {start: {x, y}, end: {x, y}}
+     * out of two coordinates at the layer: starting and ending points.
+     * @param {Object} props {start: {x, y}, end: {x, y}}
      */
-    getPropsFromCoordinates(coordinates) {
-        return {
-            x:coordinates.start.x, 
-            y:coordinates.start.y, 
-            r:Math.sqrt(
-                Math.pow(coordinates.end.x - coordinates.start.x, 2) + 
-                Math.pow(coordinates.end.y - coordinates.start.y, 2)
-            )};
+    getPropsFromCoordinates (props) {        
+        let offset = {x: 0, y: 0};
+        if (!Object.keys(props).includes("offset")) {
+            props.offset = offset;
+        }
+
+        props.x = props.start.x;
+        props.y = props.start.y;
+        props.r = Math.sqrt(
+            Math.pow(props.end.x - props.start.x, 2) + 
+            Math.pow(props.end.y - props.start.y, 2)
+        );
+
+        return props;
     }
 }
 
-/**
- * TODO:
- * Add class Ellipse
- * that uses context.ellipse() method
- */
 class Ellipse extends Shape {
     constructor() {
         super();
@@ -109,41 +150,60 @@ class Ellipse extends Shape {
     
     /**
      * Draws Ellipse
-     * @param {Canvas} canvas 
+     * @param {Layer} layer 
      * @param {Object} props Object containing properties {x, y, rX, rY, rA}
      */
-    draw(canvas, props) {
-        canvas.context.strokeStyle = this.color;
-        canvas.context.beginPath();
-        canvas.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2*Math.PI);
-        canvas.context.stroke();  
+    draw(layer, props) {
+        if(!["x", "y", "rX", "rY", "rY"].every(property => Object.keys(props).includes(property))) {
+            props = this.validateProps(props);    
+        }
+        props = this.validateProps(props);
+        layer.context.strokeStyle = this.color;
+        layer.context.beginPath();
+        layer.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2*Math.PI);
+        layer.context.closePath();
+        layer.context.stroke();
+        
+        // ammend shape's (x,y) coordinates 
+        // with consideration current Layer's offset
+        props.x -= props.offset.x;
+        props.y -= props.offset.y;
+        
+        // drop default properties.
+        delete props.offset;
+        delete props.start;
+        delete props.end;
+        return props;
     }
-
     /**
      * Shape specific method that returns object of properties required by shape to draw
-     * out of two coordinates at the canvas: starting and ending points.
+     * out of two coordinates at the layer: starting and ending points.
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
-    getPropsFromCoordinates(coordinates) {
+    getPropsFromCoordinates(props) {
+        let offset = {x: 0, y: 0};
+        if (!Object.keys(props).includes("offset")) {
+            props.offset = offset;
+        }
+
         /**
          * TODO: rework this functio to make it calculating props more properly.
          */
         let hyp = Math.sqrt(
-            Math.pow(coordinates.end.x - coordinates.start.x, 2) + 
-            Math.pow(coordinates.end.y - coordinates.start.y, 2)
+            Math.pow(props.end.x - props.start.x, 2) + 
+            Math.pow(props.end.y - props.start.y, 2)
         );
 
         let adj = Math.abs(
-            coordinates.end.y - coordinates.start.y
+            props.end.y - props.start.y
         );
         
-        return {
-            x: coordinates.start.x, 
-            y: coordinates.start.y, 
-            rX: Math.abs(coordinates.end.x - coordinates.start.x),
-            rY: Math.abs(coordinates.end.y - coordinates.start.y),
-            rA: Math.acos(adj/hyp)
-        };
+        props.x = props.start.x;
+        props.y = props.start.y;
+        props.rX = Math.abs(props.end.x - props.start.x);
+        props.rY = Math.abs(props.end.y - props.start.y);
+        props.rA = Math.acos(adj/hyp);
+        return props;
     }
 }
 
@@ -154,39 +214,101 @@ class Rectangle extends Shape {
 
     /**
      * Draws Rectangle, with starting top-left coner at props{x, y}, width and height as props{w, h}
-     * @param {Canvas} canvas Canvas object, where the shape must be drawn
+     * @param {Layer} layer layer object, where the shape must be drawn
      * @param {Object} props Object containing properties {x, y, w, h}
      */
-    draw(canvas, props) {
+    draw(layer, props) {
         /**
          * TODO:
          * consider using context.strokeRect() instead.
          * refer fo Context-API:
          * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeRect
          */
-        canvas.context.strokeStyle = this.color;
-        canvas.context.beginPath();
-        canvas.context.moveTo(props.x, props.y);
-        canvas.context.lineTo(props.x + props.w, props.y);
-        canvas.context.lineTo(props.x + props.w, props.y + props.h);
-        canvas.context.lineTo(props.x, props.y + props.h);
-        canvas.context.lineTo(props.x, props.y);
-        canvas.context.stroke();
+        props = this.validateProps(props);
+        layer.context.strokeStyle = this.color;
+        layer.context.beginPath();
+        layer.context.moveTo(props.x, props.y);
+        layer.context.lineTo(props.x + props.w, props.y);
+        layer.context.lineTo(props.x + props.w, props.y + props.h);
+        layer.context.lineTo(props.x, props.y + props.h);
+        layer.context.lineTo(props.x, props.y);
+        layer.context.closePath();
+        layer.context.stroke();
+
+        // ammend shape's (x,y) coordinates 
+        // with consideration current Layer's offset
+        props.x -= props.offset.x;
+        props.y -= props.offset.y;
+        
+        // drop default properties.
+        delete props.offset;
+        delete props.start;
+        delete props.end;
+        return props;
     }
 
     /**
      * 
-     * @param {Object} coordinates 
+     * @param {Object} props 
      */
-    getPropsFromCoordinates(coordinates) {
-        return {
-            x:coordinates.start.x, 
-            y:coordinates.start.y, 
-            w:(coordinates.end.x - coordinates.start.x),
-            h:(coordinates.end.y - coordinates.start.y)};
+    getPropsFromCoordinates(props) {
+        let offset = {x: 0, y: 0};
+        if (!Object.keys(props).includes("offset")) {
+            props.offset = offset;
+        }
+
+        props.x = props.start.x;
+        props.y = props.start.y;
+        props.w = props.end.x - props.start.x;
+        props.h = props.end.y - props.start.y;
+        return props;
     }
 }
 
+class Grid extends Shape {
+    constructor() {
+        super();
+    }
+    
+    /**
+     * Draws grid of coordiantes
+     * @param {Layer} layer Canavas to draw at
+     * @param {Object} props Reserved container for additiona params
+     */
+    draw(layer, props) {
+
+        layer.context.strokeStyle = this.color;
+        layer.context.lineWidth = 2.5;
+        layer.context.beginPath();
+        layer.context.moveTo(vwp.min.x, 0);
+        layer.context.lineTo(vwp.max.x, 0);
+        layer.context.moveTo(0, vwp.min.y);
+        layer.context.lineTo(0, vwp.max.y);
+        layer.context.stroke();
+
+        layer.context.strokeStyle = "rgb(200, 200, 230)";
+        layer.context.lineWidth = 0.05;
+        layer.context.beginPath();
+        let step = 50;
+        for (let x = step; x < vwp.max.x; x += step) {
+            layer.context.moveTo(x, vwp.min.y);
+            layer.context.lineTo(x, vwp.max.y);
+            layer.context.stroke();
+            layer.context.moveTo(-x, vwp.min.y);
+            layer.context.lineTo(-x, vwp.max.y);
+            layer.context.stroke();
+        }
+
+        for (let y = step; y < vwp.max.y; y += step) {
+            layer.context.moveTo(vwp.min.x, y);
+            layer.context.lineTo(vwp.max.x, y);
+            layer.context.stroke();
+            layer.context.moveTo(vwp.min.x, -y);
+            layer.context.lineTo(vwp.max.x, -y);
+            layer.context.stroke();
+        }
+    }
+}
 
 class Trace extends Shape {
     constructor() {
@@ -194,18 +316,31 @@ class Trace extends Shape {
     }
     
     /**
-     * Draws vertical and horizontal lines over the whole canvas,
+     * Draws vertical and horizontal lines over the whole layer,
      * crossed at position: props{x, y}
-     * @param {Canvas} canvas Canvas object, where the shape must be drawn
+     * @param {Layer} layer The object, where the shape must be drawn
      * @param {Object} props Object containing properties {x, y}
      */
-    draw(canvas, props) {
-        canvas.context.beginPath();
-        canvas.context.strokeStyle = this.color;
-        canvas.context.moveTo(props.x, 0);
-        canvas.context.lineTo(props.x, canvas.view.height);
-        canvas.context.moveTo(0, props.y);
-        canvas.context.lineTo(canvas.view.width, props.y);
-        canvas.context.stroke();
+    draw(layer, props) {
+        props = this.validateProps(props);
+        layer.context.beginPath();
+        layer.context.strokeStyle = this.color;
+        layer.context.moveTo(props.x, 0);
+        layer.context.lineTo(props.x, layer.canvas.height);
+        layer.context.moveTo(0, props.y);
+        layer.context.lineTo(layer.canvas.width, props.y);
+        layer.context.stroke();
+        
+        // drop default properties.
+        delete props.offset;
+        delete props.start;
+        delete props.end;
+        return props;
+    }
+
+    getPropsFromCoordinates(props) {
+        props.x = props.start.x;
+        props.y = props.start.y;
+        return props;
     }
 }

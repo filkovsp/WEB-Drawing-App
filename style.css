@@ -1,19 +1,14 @@
-.container{
-    display: flex;
+* {
+    font-family: Arial, Helvetica, sans-serif;
 }
-
-.color-container {
-    width: 50px;
-    display: flex;
-    flex-direction: column;
+button {
+    cursor: pointer;
 }
-
 .btn{
     width: 30px;
     height: 30px;
     margin-bottom: 5px;
     border: none;
-    cursor: pointer;
     background-color: #ccc;
 }
 
@@ -57,22 +52,10 @@
     background-color: black;
 }
 
-.toolbar-container {
-    margin-top: 10px;
-    width: 750px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.shapes {
-    margin-left: 50px;
-}
-
+/* --- Shape buttons: --- */
 .btn-circle {
     border: 2px solid #444;
     border-radius: 50px;
-    cursor: pointer;
 }
 
 .btn-ellipse {
@@ -81,33 +64,80 @@
     border-top-left-radius: 10px;
     border-bottom-right-radius : 10px;
     border-start-end-radius: 50px;
-    cursor: pointer;
 }
 
 .btn-square {
     border: 2px solid #444;
-    cursor: pointer;
 }
 
+/* --- Other buttons: --- */
 .btn-clear{
-    cursor: pointer;
     padding:5px 15px;
 }
 
-.tracer-display {
-    margin-left: 50px;
-    margin-top: 50px;
+/* --- Containers: --- */
+.container{
     display: flex;
-    flex-direction: row;
-    width: 700px;
 }
 
-.tracer-position {
+.color-container {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar-container {
+    /* margin-top: 10px; */
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shapes {
+    display: flex;
+    flex-direction: column;
+}
+
+.tracer-display {
+    display: flex;
+    flex-direction: column;
+}
+
+.tracer-display > div {
     display: flex;
     flex-direction: row;
+    margin-top: 5px;
     margin-left: 10px;
 }
 
+.tracer-display > div > label {
+    margin-right: 5px;
+}
+
+.move-controls {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 25px 25px 25px;
+    grid-template-rows: 25px 25px 25px;
+    column-gap: 3px;
+    row-gap: 3px;
+
+}
+
+.move-control {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.move-control > button {
+    width: 25px;
+    height: 25px;
+}
+
+
+/* --- Stage of layers: --- */
 #stage {
     position: relative;
     border: 1px solid lime;
