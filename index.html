@@ -58,15 +58,23 @@
         <div class="vgap" style="margin-bottom: 15px;"></div>
         <div class="move-controls">
             <div class="move-control"></div>
-            <div class="move-control"><button id="move-up" type="button"><i class="fas fa-angle-up"></i></button></div>
+            <div class="move-control">
+                <button id="move-up" type="button"><i class="fas fa-angle-up"></i></button>
+            </div>
             <div class="move-control"></div>
 
-            <div class="move-control"><button id="move-left" type="button"><i class="fas fa-angle-left"></i></button></div>
+            <div class="move-control">
+                <button id="move-left" type="button"><i class="fas fa-angle-left"></i></button>
+            </div>
             <div class="move-control"></div>
-            <div class="move-control"><button id="move-right" type="button"><i class="fas fa-angle-right"></i></button></div>
+            <div class="move-control">
+                <button id="move-right" type="button"><i class="fas fa-angle-right"></i></button>
+            </div>
 
             <div class="move-control"></div>
-            <div class="move-control"><button id="move-down" type="button"><i class="fas fa-angle-down"></i></button></div>
+            <div class="move-control">
+                <button id="move-down" type="button"><i class="fas fa-angle-down"></i></button>
+            </div>
             <div class="move-control"></div>
         </div>
         <div class="vgap" style="margin-bottom: 15px;"></div>
@@ -172,7 +180,7 @@
         });
 
         $("#clear").on("click", function(event){
-            stage.clear();
+            stage.clearAndReset();
         });
     
         /**

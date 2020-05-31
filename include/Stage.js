@@ -76,16 +76,23 @@ class Stage {
     clear(keepShapes) {
         this.main.clear(keepShapes);
         this.model.clear();
-        this.offset = {x: 0, y: 0};
     }
         
     /**
      * Full reset of that stage.
      */
     clearAndReset() {
+       /**
+         * TODO:
+         * clean all layers
+         * implement Obsever pattern here to notify layers about clening command
+         * implement Command pattern here to pass it onto each layer that needs to be cleaned. 
+         */
         this.main.clearAndReset();
         this.model.clearAndReset();
         this.init();
+        $("input[name='ox']").val(this.offset.x);
+        $("input[name='oy']").val(this.offset.y);
     }
 
     zoomIn(event) {

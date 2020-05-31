@@ -63,7 +63,8 @@ class Layer {
      * Full reset of that drawing area and context.
      */
     clearAndReset() {
-        this.clear();
+        this.offset = {x:0, y:0};
+        this.clear(false);
         this.context.resetTransform();
     }
 
