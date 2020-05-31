@@ -111,5 +111,7 @@ class Stage {
         this.main.drag(this.offset.x, this.offset.y);
         $("input[name='ox']").val(this.offset.x);
         $("input[name='oy']").val(this.offset.y);
+        
+        return this.offset;
     }
 }

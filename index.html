@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drawing App</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="http://use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <link rel="stylesheet" type="text/css" href="http://use.fontawesome.com/releases/v5.13.0/css/all.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.js"></script>
 </head>
 
@@ -92,6 +92,7 @@
 <script src="include/Dispatcher.js"></script>
 <script src="include/Layer.js"></script>
 <script src="include/Stage.js"></script>
+<script src="include/MouseTracker.js"></script>
 <script src="include/jquery.mousewheel.js"></script>
     
 
@@ -180,12 +181,13 @@
             dispatcher.dispatch(event, shape);
         });
 
-        $("#trace").on("mousedown mousewheel", function(event) {
+        $("#trace").on("click mousewheel", function(event) {
             dispatcher.dispatch(event, shape);
         });
 
-        $("#trace").on("mouseup mouseover mouseout", function(event){
-            dispatcher.setMouseDown(false);
+        $("#trace").on("mousedown mouseup mouseover mouseout", function(event){
+            // dispatcher.setMouseDown(false);
+            dispatcher.dispatch(event, shape);
         });
 
         /**
