@@ -8,6 +8,7 @@ class MouseTracker {
         this.end = {x: 0, y: 0};
         this.which = 0;
         this.clickCount = 0;
+        this.type = null;
     }
     get x () { return this.current.x; }
     get y () { return this.current.y; }
@@ -16,11 +17,11 @@ class MouseTracker {
             case 0:
                 return "None";
             case 1:
-                return "Left";
+                return "left";
             case 2:
-                return "Middle";
+                return "middle";
             case 3:
-                return "None";
+                return "right";
             default:
                 break;
         }
@@ -29,6 +30,7 @@ class MouseTracker {
     resetClickCount() {this.clickCount = 0; this.mouseDown = false;}
 
     track (event) {
+        this.type = event.type;
         switch (event.type) {
             case "mousemove":
                 this.previous = Object.assign({}, this.current);
@@ -39,11 +41,6 @@ class MouseTracker {
                     y: this.current.y - this.previous.y
                 };
                 break;
-            case "mouseup":
-                this.mouseDown = false;
-                this.which = 0;
-                // this.click();
-                break;
             case "mouseover":
             case "mouseout":
                 if(this.mouseDown) {
@@ -52,9 +49,13 @@ class MouseTracker {
                 } 
                 break;
             case "mousedown":
-                this.which = event.which;
-                this.mouseDown = true;
+                    this.which = event.which;
+                    this.mouseDown = true; 
                 break
+            case "mouseup":
+                    this.which = 0;
+                    this.mouseDown = false;
+                break;
             case "click":
                 this.which = event.which;
                 if (this.clickCount == 0) {
@@ -63,6 +64,7 @@ class MouseTracker {
                     this.end = Object.assign({}, this.current);
                 }
                 this.click();
+                break;
             case "mousewheel":
                 break;
             default:

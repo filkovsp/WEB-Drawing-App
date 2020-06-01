@@ -37,10 +37,10 @@ class Dispatcher {
          * TODO:
          * implement the logic below with Observer and/or Command patterns.
          */
-        if (event.type == "click" && shape.constructor.name == "Shape" && event.which == 1) {
+        if (event.type == "click" && shape.constructor.name == "Shape" && this.mouseTracker.button == "left") {
             alert("Pick a Shape from the tool bar!");
             return;
-        } else if (event.type == "click" && event.which == 1) {
+        } else if (event.type == "click" && this.mouseTracker.button == "left") {
             if (this.mouseTracker.clickCount == 2) {
                 this.stage.model.clear();                
                 this.stage.main.draw(shape, {
@@ -49,7 +49,7 @@ class Dispatcher {
                 });
                 this.mouseTracker.resetClickCount();
             }
-        } else if (event.type == "mousemove" && event.which == 0) {
+        } else if (event.type == "mousemove" && this.mouseTracker.button != "middle") {
             if(this.mouseTracker.clickCount > 0 && !this.mouseTracker.mouseDown) {
                 this.stage.model.clear();
                 
@@ -58,7 +58,7 @@ class Dispatcher {
                     end: this.mouseTracker.current
                 });
             }
-        } else if (event.type == "mousemove" && event.which == 2) {
+        } else if (event.type == "mousemove" && this.mouseTracker.button == "middle") {
             if (this.mouseTracker.mouseDown) {
                 this.stage.drag(
                     this.mouseTracker.moveDelta.x,
