@@ -18,7 +18,7 @@ class Layer {
      * @param {Shape} shape 
      * @param {Object} props 
      */
-    drawOnce(shape, props) {
+     sketch(shape, props) {
         return shape.draw(this, props);
     }
 
@@ -30,7 +30,7 @@ class Layer {
      */
     draw(shape, props) {
         props.offset = {x: this.offset.x, y: this.offset.y};
-        props = this.drawOnce(shape, props);
+        props = this.sketch(shape, props);
         this.shapes.push({shape: shape.clone(), props: props});
     }
 

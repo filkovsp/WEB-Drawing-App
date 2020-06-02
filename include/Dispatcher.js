@@ -38,6 +38,7 @@ class Dispatcher {
          * implement the logic below with Observer and/or Command patterns.
          */
         if (event.type == "click" && shape.constructor.name == "Shape" && this.mouseTracker.button == "left") {
+            this.mouseTracker.resetClickCount();
             alert("Pick a Shape from the tool bar!");
             return;
         } else if (event.type == "click" && this.mouseTracker.button == "left") {
@@ -53,7 +54,7 @@ class Dispatcher {
             if(this.mouseTracker.clickCount > 0 && !this.mouseTracker.mouseDown) {
                 this.stage.model.clear();
                 
-                this.stage.model.drawOnce(shape, {
+                this.stage.model.sketch(shape, {
                     start: this.mouseTracker.start, 
                     end: this.mouseTracker.current
                 });
@@ -91,7 +92,7 @@ class Dispatcher {
         $("input[name='x']").val(this.mouseTracker.x - this.stage.offset.x);
         $("input[name='y']").val(this.mouseTracker.y - this.stage.offset.y);
         this.stage.trace.clear();
-        this.stage.trace.drawOnce(this.tracer, {start: this.mouseTracker.current});
+        this.stage.trace.sketch(this.tracer, {start: this.mouseTracker.current});
         
         // Optional return. Just to let the client know that method has worked fine.
         return true;
