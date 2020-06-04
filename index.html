@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drawing App</title>
+    
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.js"></script>
+
     <!-- Fontawsome icons: -->
     <script src=https://kit.fontawesome.com/3a0ae6b487.js></script>
 </head>
@@ -66,7 +68,9 @@
             <div class="move-control">
                 <button id="move-left" type="button"><i class="fas fa-angle-left"></i></button>
             </div>
-            <div class="move-control"></div>
+            <div class="move-control" id="drag-help">
+                <span class="tooltip">?</span>
+            </div>
             <div class="move-control">
                 <button id="move-right" type="button"><i class="fas fa-angle-right"></i></button>
             </div>
@@ -116,16 +120,25 @@
     var shape = new Shape();
     var color = undefined;
 
-    $(document).ready(function() {
+    $(document).ready( () => {
+        
+        /**
+         * Make this looking fancier.
+         * with some sort of JQuery UI plugin.
+         */
+        $("#drag-help").find(".tooltip")
+            .css('cursor','pointer')
+            .attr("title", "Use buttons to drag the drawing over the canvas of drag it with middle mouse-button down");
+        
         /**
          * For each color button attach click handler:
          * onClick make button's width wider, so that it was seen that
          * the color-button has been clicked.
          */
         $.each($('.color-container').find(".btn"), (index, button) => {
-            $(button).on("click", function() {
+            $(button).on("click", (event) => {
                 $.each($('.color-container').find(".btn"), (index, button) => { 
-                    if ($(this).attr("class") == $(button).attr("class")) {
+                    if ($(event.target).attr("class") == $(button).attr("class")) {
                         $(button).css("width", "40px");
                         $(button).blur();
                         color = $(button).css("background-color");
@@ -142,9 +155,9 @@
          * box-shadow decoration for the selected shape button:
          */
         $.each($('.shapes').find(".btn"), (index, button) => { 
-            $(button).on("click", function() {
+            $(button).on("click", (event) => {
                 $.each($('.shapes').find(".btn"), (index, button) => {
-                    if ($(this).attr("id") == $(button).attr("id")) {
+                    if ($(event.target).attr("id") == $(button).attr("id")) {
                         $(button).css("box-shadow", "0 0 1px #51abff, 0 0 2px #51abff, 0 0 6px #51abff, 0 0 12px #51abff");
                         $(button).blur();
                     } else {
@@ -162,53 +175,53 @@
         $('.color-container').find(".btn.btn-black").click();
        
         /**
-         * Even handlers for shape-buttons
+         * Event handlers for shape-buttons
          */
-        $("#circle").on("click", function(event) {
+        $("#circle").on("click", (event) => {
             shape = new Circle();
             shape.setColor(color);
         });
 
-        $("#ellipse").on("click", function(event){
+        $("#ellipse").on("click", (event) => {
             shape = new Ellipse();
             shape.setColor(color);
         });
 
-        $("#square").on("click", function(event){
+        $("#square").on("click", (event) => {
             shape = new Rectangle();
             shape.setColor(color);
         });
 
-        $("#clear").on("click", function(event){
+        $("#clear").on("click", (event) => {
             stage.clearAndReset();
         });
     
         /**
          * Trace the mouse pointer and process its "mousemove" and "click" events:
          */
-        $("#trace").on("mousemove", function(event) {
+        $("#trace").on("mousemove", (event) => {
             dispatcher.dispatch(event, shape);
         });
 
-        $("#trace").on("click mousewheel", function(event) {
+        $("#trace").on("click mousewheel", (event) => {
             dispatcher.dispatch(event, shape);
         });
 
-        $("#trace").on("mousedown mouseup mouseover mouseout", function(event){
+        $("#trace").on("mousedown mouseup mouseover mouseout", (event) => {
             dispatcher.dispatch(event, shape);
         });
 
         /**
          * Trace ESC key-up event
          */
-        $(document).on("keyup", function(event) {
+        $(document).on("keyup", (event) => {
             if (event.key === "Escape") {
                 dispatcher.dispatch(event, shape);
             }
         });
 
         /**
-         * Dragging with buttins:
+         * Dragging with buttons:
          */
 
         $("input[name='ox']").val(0);

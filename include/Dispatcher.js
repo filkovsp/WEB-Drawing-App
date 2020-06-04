@@ -1,7 +1,10 @@
 /**
  * Dipatcher class watches the mouse events and "decides" what action must be perfomed based on the event:
  * - move event: 
- *      if we just move mouse over the canvas, we trace its move in "tracing" layer. look into trace() method
+ *      -- if we just move mouse over the canvas, we trace its move in "tracing" layer. look into trace() method
+ *      -- if you've done 1 click and then move the mouse - a sketch of a shape must be modelled as you keep moving mouse.
+ *      -- if before moving mouse you've pressed the middle button and keep holding it down - you drag the drawing over the canvas.
+ * 
  * - click event:
  *      if we make a click: 1st click starts modelling the chosen shape into "model" layer.
  *      by second click we set the shape as complete and draw the same shape with final props 
@@ -35,12 +38,13 @@ class Dispatcher {
 
         /**
          * TODO:
-         * implement the logic below with Observer and/or Command patterns.
+         * consider implementing the logic below with Observer and/or Command patterns.
          */
         if (event.type == "click" && shape.constructor.name == "Shape" && this.mouseTracker.button == "left") {
             this.mouseTracker.resetClickCount();
             alert("Pick a Shape from the tool bar!");
-            return;
+            // Optional return.
+            return false;
         } else if (event.type == "click" && this.mouseTracker.button == "left") {
             if (this.mouseTracker.clickCount == 2) {
                 this.stage.model.clear();                
@@ -67,9 +71,7 @@ class Dispatcher {
                 );
             }
         } else if (event.type === "keyup" && event.key === "Escape") {
-            this.init();
             this.stage.model.clear();
-            return;
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
     
             // TODO: implement Zoom in/out with mouse-wheel:
@@ -83,6 +85,9 @@ class Dispatcher {
         } else if (event.type == "mouseout") {
             this.stage.trace.clear();
         }
+        
+        // Optional return. Just to let the client know that method has worked fine.
+        return true;
     }
 
     /**

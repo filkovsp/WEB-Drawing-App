@@ -92,7 +92,6 @@ button {
 }
 
 .toolbar-container {
-    /* margin-top: 10px; */
     width: 100px;
     display: flex;
     flex-direction: column;
@@ -133,7 +132,7 @@ button {
 
 .move-control {
     text-align: center;
-    vertical-align: middle;
+    align-self: center;
 }
 
 .move-control > button {
@@ -159,4 +158,3 @@ button {
 #main  { z-index: 1; }
 #model { z-index: 2; }
 #trace { z-index: 3; }
-
