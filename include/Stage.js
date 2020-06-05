@@ -96,11 +96,21 @@ class Stage {
     }
 
     zoomIn(event) {
-        this.main.zoomIn(event);
+        let zoomFactor = this.main.zoomIn(event);
+        // this.main.drag(
+        //     this.main.canvas.width * zoomFactor / 2, 
+        //     this.main.canvas.height * zoomFactor / 2
+        // );
+        return zoomFactor;
     }
 
     zoomOut(event) {
-        this.main.zoomOut(event);
+        let zoomFactor = this.main.zoomOut(event);
+        // this.main.drag(
+        //     this.main.canvas.width * zoomFactor / 2, 
+        //     this.main.canvas.height * zoomFactor / 2
+        // );
+        return zoomFactor;
     }
 
     /**
