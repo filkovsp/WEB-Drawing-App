@@ -10,6 +10,8 @@ class Layer {
         this.zoomStep = 0.2;
         this.shapes = Array();
         this.offset = {x:0, y:0};
+        this.zoomFactor = 1;
+        this.zoomStep = 0.2;
     }
 
     /**
@@ -55,7 +57,7 @@ class Layer {
      */
     clear(keepShapes) {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (!keepShapes) {
+        if (keepShapes === false) {
             this.shapes = new Array();
         }
     }
@@ -82,7 +84,8 @@ class Layer {
      * Terurns abs(scale factor) for x axis.
      */
     getZoomFactor() {
-        return Math.abs(this.context.getTransform().a);
+        // return Math.abs(this.context.getTransform().a);
+        return this.zoomFactor;
     }
     
     setZoomFactor(z) {
@@ -95,8 +98,8 @@ class Layer {
          * f - offset for y axis
          */
 
-        this.clear();
-        this.context.save();
+        this.clear(true);
+        // this.context.save(); // not sure yet if this needed
 
         let matrix = this.context.getTransform();
         matrix.a = Math.sign(matrix.a) * z;
@@ -108,34 +111,22 @@ class Layer {
          */
         this.context.setTransform(matrix);
         this.drawAll();
-        this.context.restore();
-        return this.getZoomFactor().toFixed(2);
+        // this.context.restore(); // not sure yet if this needed
     }
 
-    zoomIn(props) {
-        this.setZoomFactor(this.getZoomFactor() + this.zoomStep);
-        
-        // move context a bit to make Zoom In/Out looking natural:
-        if (typeof(props) === "object") {
-            // props.x;
-            // props.y;
-            // this.context.translate(props.x, props.y);
-        }
-        return this.getZoomFactor().toFixed(2);
-}
+    zoomIn(event) {
+        this.zoomFactor += this.zoomStep;
+        this.setZoomFactor(this.zoomFactor.toFixed(1));
+        return this.zoomFactor.toFixed(1);
+    }
 
-    zoomOut(props) {
+    zoomOut(event) {
         // limit min(Zoom Factor) to a single Zoom Step value:
-        if (this.getZoomFactor() > 2 * this.zoomStep) {
-            this.setZoomFactor(this.getZoomFactor() - this.zoomStep);
+        if (this.zoomFactor > (2 * this.zoomStep)) {
+            this.zoomFactor -= this.zoomStep;
+            this.setZoomFactor(this.zoomFactor.toFixed(1));
         }
-        
-        // move context a bit to make Zoom In/Out looking natural:
-        if (typeof(event) === "object") {
-
-            // this.context.translate()
-        }
-        return this.getZoomFactor().toFixed(2);
+        return this.zoomFactor.toFixed(1);
     }
 
     /**
@@ -149,16 +140,6 @@ class Layer {
         
         this.clear(true);
         this.drawAll();
-        
-        // use below for zoom in/out
-        // let matrix = this.context.getTransform();
-		// matrix.e = this.offset.x;
-		// matrix.f = this.offset.y;
-        // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        // this.context.save();
-        // this.context.setTransform(matrix);
-        // this.context.translate(this.offset.x, this.offset.y);
-        // this.context.restore();
     }
 }
 
