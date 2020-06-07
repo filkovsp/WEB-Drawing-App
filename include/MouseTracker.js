@@ -4,6 +4,7 @@ class MouseTracker {
         this.previous = {x: 0, y: 0};
         this.moveDelta = {x: 0, y: 0};
         this.mouseDown = false;
+        this.mousOver = false;
         this.start = {x: 0, y: 0};
         this.end = {x: 0, y: 0};
         this.which = 0;
@@ -42,7 +43,14 @@ class MouseTracker {
                 };
                 break;
             case "mouseover":
+                this.mousOver = true;
+                if(this.mouseDown) {
+                    this.mouseDown = false;
+                    this.end = Object.assign({}, this.current); // consider this.previous;
+                } 
+                break;
             case "mouseout":
+                this.mousOver = false;
                 if(this.mouseDown) {
                     this.mouseDown = false;
                     this.end = Object.assign({}, this.current); // consider this.previous;
