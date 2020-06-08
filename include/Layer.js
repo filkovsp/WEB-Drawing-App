@@ -110,6 +110,7 @@ class Layer {
      */
     clearAndReset() {
         this.offset = {x: 0, y: 0};
+        this.zoomFactor = 1;
         this.clear(false);
         this.context.resetTransform();
     }

@@ -13,7 +13,6 @@ class Stage {
         this.main = new Layer(main);
         this.model = new Layer(model);
         this.trace = new Layer(trace);
-        this.layers = new Array();
         this.init();
     }
 
@@ -23,7 +22,8 @@ class Stage {
         this.zoomFactor = 1;
         this.zoomStep = 0.2;
 
-        // default layers:
+        // Default layers:
+        this.layers = new Array();
         this.addLayer(this.trace);
         this.addLayer(this.model);
         this.addLayer(this.main);
@@ -35,6 +35,11 @@ class Stage {
         // Decorate line styles for tarcing and modelling layers:
         this.trace.context.setLineDash([1, 3]);
         this.model.context.setLineDash([1, 2]);
+
+        // Set/Update Zoom and Offset display:
+        $("input[name='ox']").val(this.offset.x);
+        $("input[name='oy']").val(this.offset.y);
+        $("input[name='z']").val(this.zoomFactor.toFixed(1));
     }
 
     /**
@@ -55,7 +60,7 @@ class Stage {
     }
 
     /**
-     * Remuves the drawing layer by its Id.
+     * Removes the drawing layer by its Id.
      * @param {Number} id 
      */
     removeLayer(id) {
@@ -93,8 +98,6 @@ class Stage {
         this.main.clearAndReset();
         this.model.clearAndReset();
         this.init();
-        $("input[name='ox']").val(this.offset.x);
-        $("input[name='oy']").val(this.offset.y);
     }
 
     zoomIn(event) {
