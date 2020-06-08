@@ -33,24 +33,12 @@ class Layer {
         
         props.offset = {x: 0, y: 0};
         props.zoom = 1;
-        this.sketch(shape, props);
+        props = this.sketch(shape, props);
         
         props.offset = this.offset;
         props.zoom = this.zoomFactor;
         props = shape.validateProps(props);
         this.shapes.push({shape: shape.clone(), props: props});
-    }
-
-    /**
-     * Draw all shapes that are in the list. With offset shift applied to (x, y) coordinates.
-     */
-    drawAll() {
-        this.shapes.forEach(el => {
-            let props = Object.assign({}, el.props);
-            props.offset = this.offset;
-            props.zoom = this.zoomFactor;
-            el.shape.draw(this, props);
-        }, this);
     }
 
     getZoomFactor() {
@@ -59,12 +47,23 @@ class Layer {
     
     setZoomFactor(props) {
         this.zoomFactor = props.zoom;
+
         this.clear(true);
-        // let matrix = this.context.getTransform();
-        // matrix.a = Math.sign(matrix.a) * props.zoom;
-        // matrix.d = Math.sign(matrix.a) * props.zoom;
-        // this.context.setTransform(matrix);
-        this.drawAll();
+        this.context.save();
+        
+        let matrix = this.context.getTransform();
+        matrix.a = Math.sign(matrix.a) * this.zoomFactor;
+        matrix.d = Math.sign(matrix.a) * this.zoomFactor;
+        matrix.e = this.offset.x;
+        matrix.f = this.offset.y;
+        
+        this.context.setTransform(matrix);
+        
+        this.shapes.forEach(el => {
+            this.sketch(el.shape, el.props);
+        }, this);
+
+        this.context.restore();
     }
 
     /**
@@ -77,7 +76,21 @@ class Layer {
         this.offset.y = y;
         
         this.clear(true);
-        this.drawAll();
+        this.context.save();
+        
+        let matrix = this.context.getTransform();
+        matrix.a = Math.sign(matrix.a) * this.zoomFactor;
+        matrix.d = Math.sign(matrix.a) * this.zoomFactor;
+        matrix.e = this.offset.x;
+        matrix.f = this.offset.y;
+        
+        this.context.setTransform(matrix);
+        
+        this.shapes.forEach(el => {
+            this.sketch(el.shape, el.props);
+        }, this);
+
+        this.context.restore();
     }
 
     /**

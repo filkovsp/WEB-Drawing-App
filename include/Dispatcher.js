@@ -72,6 +72,7 @@ class Dispatcher {
             }
         } else if (event.type === "keyup" && event.key === "Escape") {
             this.stage.model.clear();
+            this.mouseTracker.resetClickCount();
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
     
             // TODO: implement Zoom in/out with mouse-wheel:

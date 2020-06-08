@@ -107,14 +107,6 @@ class Circle extends Shape {
             props = this.validateProps(props);    
         }
 
-        /**
-         * if we've been supplied with offset,
-         * apply this param to the x and y:
-         */
-        props.x = (props.x + props.offset.x) * props.zoom;
-        props.y = (props.y + props.offset.y) * props.zoom;
-        props.r *= props.zoom;
-
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
         layer.context.arc(props.x, props.y, props.r, 0, 2 * Math.PI);
@@ -177,11 +169,6 @@ class Ellipse extends Shape {
         if(!["x", "y", "rX", "rY", "rA"].every(property => Object.keys(props).includes(property))) {
             props = this.validateProps(props);    
         }
-        
-        props.x = (props.x + props.offset.x) * props.zoom;
-        props.y = (props.y + props.offset.y) * props.zoom;
-        props.rX *= props.zoom;
-        props.rY *= props.zoom;
 
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
@@ -251,10 +238,6 @@ class Rectangle extends Shape {
         if(!["x", "y", "w", "h"].every(key => Object.keys(props).includes(key))) {
             props = this.validateProps(props);
         }
-        props.x = (props.x + props.offset.x) * props.zoom;
-        props.y = (props.y + props.offset.y) * props.zoom;
-        props.w *= props.zoom;
-        props.h *= props.zoom;
 
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
