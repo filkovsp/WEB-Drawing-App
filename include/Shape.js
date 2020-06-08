@@ -35,16 +35,6 @@ class Shape {
     }
 
     /**
-     * Interface for the Shape's specific method that returns object of properties 
-     * required by shape to draw it out of two coordinates at the layer: 
-     * starting and ending points.
-     * @param {Object} coordinates {start: {x, y}, end: {x, y}}
-     */
-    getPropsFromCoordinates({start, end}) {
-        throw new Error("implement this method in Child class");
-    }
-
-    /**
      * Method that validates
      * whether we receive in props just to points {start: {x, y}, end: {x, y}}
      * or, this is shape-speciwic params for drawing particular shape.
@@ -53,11 +43,25 @@ class Shape {
      * @param {*} props 
      */
     validateProps(props) {
-        // if (typeof(props) === "object" && ["start", "end", "offset"].some(key => props.hasOwnProperty(key))) {
-        if (["start", "end"].some(key => Object.keys(props).includes(key))) {
-            return this.getPropsFromCoordinates(props);
+        if (!Object.keys(props).includes("offset")) {
+            props.offset = {x: 0, y: 0};
         }
-        return props;
+
+        if (!Object.keys(props).includes("zoom")) {
+            props.zoom = 1;
+        }
+
+        return this.getPropsFromCoordinates(props);
+    }
+
+    /**
+     * Interface for the Shape's specific method that returns object of properties 
+     * required by shape to draw it out of two coordinates at the layer: 
+     * starting and ending points.
+     * @param {Object} coordinates {start: {x, y}, end: {x, y}}
+     */
+    getPropsFromCoordinates({start, end}) {
+        throw new Error("implement this method in Child class");
     }
 
     /**
@@ -99,7 +103,7 @@ class Circle extends Shape {
      * @param {Object} props Object containing properties {x, y, r}
      */
     draw(layer, props) {
-        if(!["x", "y", "r"].every(property => Object.keys(props).includes(property))) {
+        if(!["x", "y", "r"].every(key => Object.keys(props).includes(key))) {
             props = this.validateProps(props);    
         }
 
@@ -108,16 +112,13 @@ class Circle extends Shape {
         layer.context.arc(props.x, props.y, props.r, 0, 2 * Math.PI);
         layer.context.closePath();
         layer.context.stroke();
-        
-        // ammend shape's (x,y) coordinates 
-        // with consideration current Layer's offset
-        props.x -= props.offset.x;
-        props.y -= props.offset.y;
-        
-        // drop default properties.
+
+        /**
+         * once shape is drawn, we don't need 
+         * props {offset, zoom} any more.
+         */
         delete props.offset;
-        delete props.start;
-        delete props.end;
+        delete props.zoom;
         return props;
     }
 
@@ -126,19 +127,30 @@ class Circle extends Shape {
      * out of two coordinates at the layer: starting and ending points.
      * @param {Object} props {start: {x, y}, end: {x, y}}
      */
-    getPropsFromCoordinates (props) {        
-        let offset = {x: 0, y: 0};
-        if (!Object.keys(props).includes("offset")) {
-            props.offset = offset;
+    getPropsFromCoordinates (props) {
+        if(["start", "end"].every(key => Object.keys(props).includes(key))) {
+            props.x = props.start.x;
+            props.y = props.start.y;
+            props.r = Math.sqrt(
+                Math.pow(props.end.x - props.start.x, 2) + 
+                Math.pow(props.end.y - props.start.y, 2)
+            );
+
+            /**
+             * Once we've calculated shape-related params,
+             * we don't need props{start, end} any more:
+             */
+            delete props.start;
+            delete props.end;
         }
 
-        props.x = props.start.x;
-        props.y = props.start.y;
-        props.r = Math.sqrt(
-            Math.pow(props.end.x - props.start.x, 2) + 
-            Math.pow(props.end.y - props.start.y, 2)
-        );
-
+        /**
+         * To valiadate the real shape params, 
+         * we also need to subtract the offset:
+         */
+        props.x = (props.x - props.offset.x) / props.zoom;
+        props.y = (props.y - props.offset.y) / props.zoom;
+        props.r /= props.zoom;
         return props;
     }
 }
@@ -154,25 +166,19 @@ class Ellipse extends Shape {
      * @param {Object} props Object containing properties {x, y, rX, rY, rA}
      */
     draw(layer, props) {
-        if(!["x", "y", "rX", "rY", "rY"].every(property => Object.keys(props).includes(property))) {
+        if(!["x", "y", "rX", "rY", "rA"].every(property => Object.keys(props).includes(property))) {
             props = this.validateProps(props);    
         }
-        props = this.validateProps(props);
+
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
-        layer.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2*Math.PI);
+        layer.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2 * Math.PI);
         layer.context.closePath();
         layer.context.stroke();
         
-        // ammend shape's (x,y) coordinates 
-        // with consideration current Layer's offset
-        props.x -= props.offset.x;
-        props.y -= props.offset.y;
-        
         // drop default properties.
         delete props.offset;
-        delete props.start;
-        delete props.end;
+        delete props.zoom;
         return props;
     }
     /**
@@ -181,28 +187,33 @@ class Ellipse extends Shape {
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
     getPropsFromCoordinates(props) {
-        let offset = {x: 0, y: 0};
-        if (!Object.keys(props).includes("offset")) {
-            props.offset = offset;
+        if(["start", "end"].every(key => Object.keys(props).includes(key))) {
+            /**
+             * TODO: rework this functio to make it calculating props more properly.
+             */
+            let hyp = Math.sqrt(
+                Math.pow(props.end.x - props.start.x, 2) + 
+                Math.pow(props.end.y - props.start.y, 2)
+            );
+
+            let adj = Math.abs(
+                props.end.y - props.start.y
+            );
+            
+            props.x = props.start.x;
+            props.y = props.start.y;
+            props.rX = Math.abs(props.end.x - props.start.x);
+            props.rY = Math.abs(props.end.y - props.start.y);
+            props.rA = Math.acos(adj/hyp);
+            
+            delete props.start;
+            delete props.end;
         }
 
-        /**
-         * TODO: rework this functio to make it calculating props more properly.
-         */
-        let hyp = Math.sqrt(
-            Math.pow(props.end.x - props.start.x, 2) + 
-            Math.pow(props.end.y - props.start.y, 2)
-        );
-
-        let adj = Math.abs(
-            props.end.y - props.start.y
-        );
-        
-        props.x = props.start.x;
-        props.y = props.start.y;
-        props.rX = Math.abs(props.end.x - props.start.x);
-        props.rY = Math.abs(props.end.y - props.start.y);
-        props.rA = Math.acos(adj/hyp);
+        props.x = (props.x - props.offset.x) / props.zoom;
+        props.y = (props.y - props.offset.y) / props.zoom;
+        props.rX /= props.zoom;
+        props.rY /= props.zoom;
         return props;
     }
 }
@@ -224,7 +235,10 @@ class Rectangle extends Shape {
          * refer fo Context-API:
          * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeRect
          */
-        props = this.validateProps(props);
+        if(!["x", "y", "w", "h"].every(key => Object.keys(props).includes(key))) {
+            props = this.validateProps(props);
+        }
+
         layer.context.strokeStyle = this.color;
         layer.context.beginPath();
         layer.context.moveTo(props.x, props.y);
@@ -235,15 +249,8 @@ class Rectangle extends Shape {
         layer.context.closePath();
         layer.context.stroke();
 
-        // ammend shape's (x,y) coordinates 
-        // with consideration current Layer's offset
-        props.x -= props.offset.x;
-        props.y -= props.offset.y;
-        
-        // drop default properties.
         delete props.offset;
-        delete props.start;
-        delete props.end;
+        delete props.zoom;
         return props;
     }
 
@@ -252,15 +259,20 @@ class Rectangle extends Shape {
      * @param {Object} props 
      */
     getPropsFromCoordinates(props) {
-        let offset = {x: 0, y: 0};
-        if (!Object.keys(props).includes("offset")) {
-            props.offset = offset;
+        if(["start", "end"].every(key => Object.keys(props).includes(key))) {
+            props.x = props.start.x;
+            props.y = props.start.y;
+            props.w = props.end.x - props.start.x;
+            props.h = props.end.y - props.start.y;   
+            
+            delete props.start;
+            delete props.end;        
         }
 
-        props.x = props.start.x;
-        props.y = props.start.y;
-        props.w = props.end.x - props.start.x;
-        props.h = props.end.y - props.start.y;
+        props.x = (props.x - props.offset.x) / props.zoom;
+        props.y = (props.y - props.offset.y) / props.zoom;
+        props.w /= props.zoom;
+        props.h /= props.zoom;
         return props;
     }
 }

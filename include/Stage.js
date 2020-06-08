@@ -20,6 +20,8 @@ class Stage {
     init() {
         // initial offset value
         this.offset = {x: 0, y: 0};
+        this.zoomFactor = 1;
+        this.zoomStep = 0.2;
 
         // default layers:
         this.addLayer(this.trace);
@@ -96,21 +98,31 @@ class Stage {
     }
 
     zoomIn(event) {
-        let zoomFactor = this.main.zoomIn(event);
-        // this.main.drag(
-        //     this.main.canvas.width * zoomFactor / 2, 
-        //     this.main.canvas.height * zoomFactor / 2
-        // );
-        return zoomFactor;
+        this.zoomFactor += this.zoomStep;
+        let props = {
+            x: (event.mousOver) ? event.x : this.trace.canvas.width / 2,
+            y: (event.mousOver) ? event.y : this.trace.canvas.height / 2,
+            offset: this.offset, 
+            zoom: this.zoomFactor.toFixed(1)
+        };
+
+        this.main.setZoomFactor(props);
+        return this.zoomFactor.toFixed(1);
     }
 
     zoomOut(event) {
-        let zoomFactor = this.main.zoomOut(event);
-        // this.main.drag(
-        //     this.main.canvas.width * zoomFactor / 2, 
-        //     this.main.canvas.height * zoomFactor / 2
-        // );
-        return zoomFactor;
+        if (this.zoomFactor > (2 * this.zoomStep)) {
+            this.zoomFactor -= this.zoomStep;
+            let props = {
+                x: (event.mousOver) ? event.x : this.trace.canvas.width / 2,
+                y: (event.mousOver) ? event.y : this.trace.canvas.height / 2,
+                offset: this.offset, 
+                zoom: this.zoomFactor.toFixed(1)
+            };
+            
+            this.main.setZoomFactor(props);
+        }
+        return this.zoomFactor.toFixed(1);
     }
 
     /**
@@ -123,7 +135,7 @@ class Stage {
         this.offset.y += y;
         /**
          * TODO:
-         * apply sdragging to all layers except tracing and modelling ones.
+         * apply dragging to all layers except tracing and modelling ones.
          */
         this.main.drag(this.offset.x, this.offset.y);
         $("input[name='ox']").val(this.offset.x);

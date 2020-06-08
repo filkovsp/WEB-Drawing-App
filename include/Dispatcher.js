@@ -72,13 +72,14 @@ class Dispatcher {
             }
         } else if (event.type === "keyup" && event.key === "Escape") {
             this.stage.model.clear();
+            this.mouseTracker.resetClickCount();
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
     
             // TODO: implement Zoom in/out with mouse-wheel:
             if (event.deltaY > 0) {
-                // $("input[name='z']").val(this.stage.zoomIn(this.mouseTracker));
+                $("input[name='z']").val(this.stage.zoomIn(this.mouseTracker));
             } else {
-                // $("input[name='z']").val(this.stage.zoomOut(this.mouseTracker));
+                $("input[name='z']").val(this.stage.zoomOut(this.mouseTracker));
             }
         } else if (event.type == "mouseout") {
             this.stage.trace.clear();
