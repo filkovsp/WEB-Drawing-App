@@ -7,6 +7,7 @@
  *     we start "modelling" our shape. we drug mouse over the canvase, watch the sape changing its size, 
  *     and choose the size we want to give for the shape.
  *   - trace layer - decorating layer, just to make fancy cross horizontal and vertical lines, crossing at the mouse pointer.
+ * 
  */
 class Stage {
     constructor(main, model, trace) {
@@ -86,15 +87,9 @@ class Stage {
     }
         
     /**
-     * Full reset of that stage.
+     * Full reset and clear of the stage.
      */
     clearAndReset() {
-       /**
-         * TODO:
-         * clean all layers
-         * implement Obsever pattern here to notify layers about clening command
-         * implement Command pattern here to pass it onto each layer that needs to be cleaned. 
-         */
         this.main.clearAndReset();
         this.model.clearAndReset();
         this.init();
@@ -105,11 +100,27 @@ class Stage {
         let props = {
             x: (event.mousOver) ? event.x : this.trace.canvas.width / 2,
             y: (event.mousOver) ? event.y : this.trace.canvas.height / 2,
-            offset: this.offset, 
             zoom: this.zoomFactor.toFixed(1)
         };
 
+        /**
+         * use this way, 
+         * to make it Zoom In always relatively the center of the canvas:
+         *  this.offset.x -= this.zoomStep * this.trace.canvas.width / 2;
+         *  this.offset.y -= this.zoomStep * this.trace.canvas.height / 2;
+         * 
+         * use this way,
+         * to make Zoom In relatively the mouse position:
+         *  this.offset.x -= this.zoomStep * props.x;
+         *  this.offset.y -= this.zoomStep * props.y;
+         */
+        this.offset.x -= (event.mousOver) ? this.zoomStep * props.x : this.zoomStep * this.trace.canvas.width / 2;
+        this.offset.y -= (event.mousOver) ? this.zoomStep * props.y : this.zoomStep * this.trace.canvas.height / 2;
+        props.offset = this.offset;
+
         this.main.setZoomFactor(props);
+        $("input[name='ox']").val(this.offset.x);
+        $("input[name='oy']").val(this.offset.y);
         return this.zoomFactor.toFixed(1);
     }
 
@@ -119,11 +130,28 @@ class Stage {
             let props = {
                 x: (event.mousOver) ? event.x : this.trace.canvas.width / 2,
                 y: (event.mousOver) ? event.y : this.trace.canvas.height / 2,
-                offset: this.offset, 
                 zoom: this.zoomFactor.toFixed(1)
             };
-            
+    
+            /**
+             * use this way, 
+             * to make it Zoom Out relatively the center ot the canvas:
+             *  this.offset.x += this.zoomStep * this.trace.canvas.width / 2;
+             *  this.offset.y += this.zoomStep * this.trace.canvas.height / 2;
+             * 
+             * use this way, 
+             * to make Zoom Out relatively the mouse position:
+             *  this.offset.x += this.zoomStep * props.x;
+             *  this.offset.y += this.zoomStep * props.y;
+             */
+            this.offset.x += (event.mousOver) ? this.zoomStep * props.x : this.zoomStep * this.trace.canvas.width / 2;
+            this.offset.y += (event.mousOver) ? this.zoomStep * props.y : this.zoomStep * this.trace.canvas.height / 2;
+
+            props.offset = this.offset;
+
             this.main.setZoomFactor(props);
+            $("input[name='ox']").val(this.offset.x);
+            $("input[name='oy']").val(this.offset.y);
         }
         return this.zoomFactor.toFixed(1);
     }
@@ -136,14 +164,21 @@ class Stage {
     drag(x, y) {
         this.offset.x += x;
         this.offset.y += y;
-        /**
-         * TODO:
-         * apply dragging to all layers except tracing and modelling ones.
-         */
+
         this.main.drag(this.offset.x, this.offset.y);
         $("input[name='ox']").val(this.offset.x);
         $("input[name='oy']").val(this.offset.y);
         
         return this.offset;
+    }
+
+    /**
+     * Centres the whole drawing to the middle of the canvas.
+     */
+    center() {
+        this.drag(
+            -1 * this.offset.x + (1 - this.zoomFactor) * this.trace.canvas.width / 2, 
+            -1 * this.offset.y + (1 - this.zoomFactor) * this.trace.canvas.height / 2
+        );
     }
 }
