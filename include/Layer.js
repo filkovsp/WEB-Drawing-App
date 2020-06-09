@@ -10,11 +10,10 @@ class Layer {
         this.shapes = Array();
         this.offset = {x: 0, y: 0};
         this.zoomFactor = 1;
-        this.zoomStep = 0.2;
     }
 
     /**
-     * Draw the shape at coordinastes as provided - this is exact location at the canvas.
+     * Draws the shape at coordinastes as provided - this is exact location at the canvas.
      * Returns properties with offset applied to (x, y) position.s
      * @param {Shape} shape 
      * @param {Object} props 
@@ -24,8 +23,8 @@ class Layer {
     }
 
     /**
-     * Draw a new shape on the canvas, and it into the list of "registered shapes",
-     * with current offset applied to its (x, y) coordinates.
+     * Draws a new shape on the canvas, and adds it into the list of "registered shapes",
+     * with current offset applied to its (x, y) coordinates by shape.validateProps(props).
      * @param {Shape} shape Shape to draw
      * @param {Object} props 
      */
@@ -40,22 +39,19 @@ class Layer {
         props = shape.validateProps(props);
         this.shapes.push({shape: shape.clone(), props: props});
     }
-
-    getZoomFactor() {
-        return this.zoomFactor;
-    }
     
     setZoomFactor(props) {
         this.zoomFactor = props.zoom;
+        this.offset = props.offset;
 
         this.clear(true);
         this.context.save();
-        
+
         let matrix = this.context.getTransform();
-        matrix.a = Math.sign(matrix.a) * this.zoomFactor;
-        matrix.d = Math.sign(matrix.a) * this.zoomFactor;
-        matrix.e = this.offset.x;
-        matrix.f = this.offset.y;
+        matrix.a = Math.sign(matrix.a) * props.zoom;
+        matrix.d = Math.sign(matrix.a) * props.zoom;
+        matrix.e = props.offset.x;
+        matrix.f = props.offset.y;
         
         this.context.setTransform(matrix);
         
@@ -67,7 +63,7 @@ class Layer {
     }
 
     /**
-     * Moves shapes their new positions 
+     * Moves shape(s) to their new position(s)
      * @param {Number} x Position offset by X axis
      * @param {Number} y Position offset by Y axis
      */

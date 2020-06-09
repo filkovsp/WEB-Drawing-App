@@ -69,8 +69,8 @@
             <div class="move-control">
                 <button id="move-left" type="button"><i class="fas fa-angle-left"></i></button>
             </div>
-            <div class="move-control" id="drag-help">
-                <span class="tooltip">?</span>
+            <div class="move-control">
+                <button id="move-center" type="button"><i class="fas fa-arrows-alt"></i></button>
             </div>
             <div class="move-control">
                 <button id="move-right" type="button"><i class="fas fa-angle-right"></i></button>
@@ -127,7 +127,7 @@
          * Make this looking fancier.
          * with some sort of JQuery UI plugin.
          */
-        $("#drag-help").find(".tooltip")
+        $("#move-center")
             .css('cursor','pointer')
             .attr("title", "Use buttons to drag the drawing over the canvas, or drag it with middle mouse-button down");
         
@@ -242,6 +242,10 @@
 
         $("#move-right").on("click", () => {
             stage.drag(50, 0);
+        });
+
+        $("#move-center").on("click", () => {
+             stage.center();
         });
 
     });
