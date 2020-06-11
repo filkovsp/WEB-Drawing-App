@@ -98,29 +98,17 @@ class Stage {
     zoomIn(event) {
         this.zoomFactor += this.zoomStep;
         let props = {
-            x: (event.mousOver) ? event.x : this.trace.canvas.width / 2,
-            y: (event.mousOver) ? event.y : this.trace.canvas.height / 2,
+            x: (event.mousOver) ? event.x - this.offset.x : this.trace.canvas.width / 2 - this.offset.x,
+            y: (event.mousOver) ? event.y - this.offset.y : this.trace.canvas.height / 2 - this.offset.y,
             zoom: this.zoomFactor.toFixed(1)
         };
 
-        /**
-         * use this way, 
-         * to make it Zoom In always relatively the center of the canvas:
-         *  this.offset.x -= this.zoomStep * this.trace.canvas.width / 2;
-         *  this.offset.y -= this.zoomStep * this.trace.canvas.height / 2;
-         * 
-         * use this way,
-         * to make Zoom In relatively the mouse position:
-         *  this.offset.x -= this.zoomStep * props.x;
-         *  this.offset.y -= this.zoomStep * props.y;
-         */
-        this.offset.x -= (event.mousOver) ? this.zoomStep * props.x : this.zoomStep * this.trace.canvas.width / 2;
-        this.offset.y -= (event.mousOver) ? this.zoomStep * props.y : this.zoomStep * this.trace.canvas.height / 2;
-        props.offset = this.offset;
-
+        props.offset = { 
+            x: props.x * (1 - this.zoomFactor),
+            y: props.y * (1 - this.zoomFactor) 
+        };
+        
         this.main.setZoomFactor(props);
-        $("input[name='ox']").val(this.offset.x);
-        $("input[name='oy']").val(this.offset.y);
         return this.zoomFactor.toFixed(1);
     }
 
@@ -128,30 +116,17 @@ class Stage {
         if (this.zoomFactor > (2 * this.zoomStep)) {
             this.zoomFactor -= this.zoomStep;
             let props = {
-                x: (event.mousOver) ? event.x : this.trace.canvas.width / 2,
-                y: (event.mousOver) ? event.y : this.trace.canvas.height / 2,
+                x: (event.mousOver) ? event.x - this.offset.x : this.trace.canvas.width / 2 - this.offset.x,
+                y: (event.mousOver) ? event.y - this.offset.y : this.trace.canvas.height / 2 - this.offset.y,
                 zoom: this.zoomFactor.toFixed(1)
             };
     
-            /**
-             * use this way, 
-             * to make it Zoom Out relatively the center ot the canvas:
-             *  this.offset.x += this.zoomStep * this.trace.canvas.width / 2;
-             *  this.offset.y += this.zoomStep * this.trace.canvas.height / 2;
-             * 
-             * use this way, 
-             * to make Zoom Out relatively the mouse position:
-             *  this.offset.x += this.zoomStep * props.x;
-             *  this.offset.y += this.zoomStep * props.y;
-             */
-            this.offset.x += (event.mousOver) ? this.zoomStep * props.x : this.zoomStep * this.trace.canvas.width / 2;
-            this.offset.y += (event.mousOver) ? this.zoomStep * props.y : this.zoomStep * this.trace.canvas.height / 2;
-
-            props.offset = this.offset;
+            props.offset = { 
+                x: props.x * (1 - this.zoomFactor),
+                y: props.y * (1 - this.zoomFactor) 
+            };
 
             this.main.setZoomFactor(props);
-            $("input[name='ox']").val(this.offset.x);
-            $("input[name='oy']").val(this.offset.y);
         }
         return this.zoomFactor.toFixed(1);
     }
