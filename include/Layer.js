@@ -7,9 +7,10 @@ class Layer {
     constructor(canvas) {
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
-        this.shapes = Array();
-        this.offset = {x: 0, y: 0};
+        this.shapes = Array();        
         this.zoomFactor = 1;
+        this.zoomOffset = {x: 0, y: 0};
+        this.offset = {x: 0, y: 0};
     }
 
     /**
@@ -34,7 +35,10 @@ class Layer {
         props.zoom = 1;
         props = this.sketch(shape, props);
         
-        props.offset = this.offset;
+        props.offset = {
+            x: this.offset.x + this.zoomOffset.x,
+            y: this.offset.y + this.zoomOffset.y
+        };
         props.zoom = this.zoomFactor;
         props = shape.validateProps(props);
         this.shapes.push({shape: shape.clone(), props: props});
@@ -42,7 +46,7 @@ class Layer {
     
     setZoomFactor(props) {
         this.zoomFactor = props.zoom;
-        this.offset = props.offset;
+        this.zoomOffset = props.zoomOffset;
 
         this.clear(true);
         this.context.save();
@@ -50,8 +54,8 @@ class Layer {
         let matrix = this.context.getTransform();
         matrix.a = Math.sign(matrix.a) * props.zoom;
         matrix.d = Math.sign(matrix.a) * props.zoom;
-        matrix.e = props.offset.x;
-        matrix.f = props.offset.y;
+        matrix.e = this.offset.x + props.zoomOffset.x;
+        matrix.f = this.offset.y + props.zoomOffset.y;
         
         this.context.setTransform(matrix);
         
@@ -77,8 +81,8 @@ class Layer {
         let matrix = this.context.getTransform();
         matrix.a = Math.sign(matrix.a) * this.zoomFactor;
         matrix.d = Math.sign(matrix.a) * this.zoomFactor;
-        matrix.e = this.offset.x;
-        matrix.f = this.offset.y;
+        matrix.e = this.offset.x + this.zoomOffset.x;
+        matrix.f = this.offset.y + this.zoomOffset.y;
         
         this.context.setTransform(matrix);
         
