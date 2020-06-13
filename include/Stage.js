@@ -21,6 +21,7 @@ class Stage {
         // initial offset value
         this.offset = {x: 0, y: 0};
         this.zoomFactor = 1;
+        this.zoomOffset = {x: 0, y: 0}
         this.zoomStep = 0.2;
 
         // Default layers:
@@ -98,15 +99,15 @@ class Stage {
     zoomIn(event) {
         this.zoomFactor += this.zoomStep;
         let props = {
-            x: (event.mousOver) ? event.x - this.offset.x : this.trace.canvas.width / 2 - this.offset.x,
-            y: (event.mousOver) ? event.y - this.offset.y : this.trace.canvas.height / 2 - this.offset.y,
+            x: (event.mousOver) ? event.x - this.offset.x: this.trace.canvas.width / 2,
+            y: (event.mousOver) ? event.y - this.offset.y: this.trace.canvas.height / 2,
             zoom: this.zoomFactor.toFixed(1)
         };
 
-        props.offset = { 
-            x: props.x * (1 - this.zoomFactor),
-            y: props.y * (1 - this.zoomFactor) 
-        };
+        this.zoomOffset.x -= (props.x - this.zoomOffset.x) / (this.zoomFactor - this.zoomStep) * this.zoomStep;
+        this.zoomOffset.y -= (props.y - this.zoomOffset.y ) / (this.zoomFactor - this.zoomStep) * this.zoomStep;
+
+        props.zoomOffset = this.zoomOffset;
         
         this.main.setZoomFactor(props);
         return this.zoomFactor.toFixed(1);
@@ -116,15 +117,15 @@ class Stage {
         if (this.zoomFactor > (2 * this.zoomStep)) {
             this.zoomFactor -= this.zoomStep;
             let props = {
-                x: (event.mousOver) ? event.x - this.offset.x : this.trace.canvas.width / 2 - this.offset.x,
-                y: (event.mousOver) ? event.y - this.offset.y : this.trace.canvas.height / 2 - this.offset.y,
+                x: (event.mousOver) ? event.x - this.offset.x: this.trace.canvas.width / 2,
+                y: (event.mousOver) ? event.y - this.offset.y: this.trace.canvas.height / 2,
                 zoom: this.zoomFactor.toFixed(1)
             };
     
-            props.offset = { 
-                x: props.x * (1 - this.zoomFactor),
-                y: props.y * (1 - this.zoomFactor) 
-            };
+            this.zoomOffset.x += (props.x - this.zoomOffset.x) / (this.zoomFactor + this.zoomStep) * this.zoomStep;
+            this.zoomOffset.y += (props.y - this.zoomOffset.y ) / (this.zoomFactor + this.zoomStep) * this.zoomStep;
+
+            props.zoomOffset = this.zoomOffset;
 
             this.main.setZoomFactor(props);
         }
@@ -141,6 +142,7 @@ class Stage {
         this.offset.y += y;
 
         this.main.drag(this.offset.x, this.offset.y);
+
         $("input[name='ox']").val(this.offset.x);
         $("input[name='oy']").val(this.offset.y);
         
@@ -152,8 +154,9 @@ class Stage {
      */
     center() {
         this.drag(
-            -1 * this.offset.x + (1 - this.zoomFactor) * this.trace.canvas.width / 2, 
-            -1 * this.offset.y + (1 - this.zoomFactor) * this.trace.canvas.height / 2
+            -1 * this.offset.x + (this.trace.canvas.width / 2 + this.zoomOffset.x) / 2, 
+            -1 * this.offset.y + (this.trace.canvas.height / 2 + this.zoomOffset.y) / 2
         );
     }
+
 }
