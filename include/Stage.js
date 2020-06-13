@@ -154,8 +154,8 @@ class Stage {
      */
     center() {
         this.drag(
-            -1 * this.offset.x + (this.trace.canvas.width / 2 + this.zoomOffset.x) / 2, 
-            -1 * this.offset.y + (this.trace.canvas.height / 2 + this.zoomOffset.y) / 2
+            -1 * (this.offset.x + this.zoomOffset.x) + this.trace.canvas.width * ( 1- this.zoomFactor) / 2, 
+            -1 * (this.offset.y + this.zoomOffset.y) + this.trace.canvas.height * ( 1- this.zoomFactor) / 2
         );
     }
 
