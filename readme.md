@@ -15,6 +15,18 @@ Published version of this one is here:
 ### Functionality
 This relates to my version of the app: [WEB-Drawing-App](https://filkovsp.github.io/WEB-Drawing-App).
 1. Choose a shape. Colour will be set to black by default.
-2. Draw a shape by clicking once on the canvas, then move mouse and watch how shape's sketch chages its size. Make second click when you're satisfied with the size and place. This is called modelling process. If you decide to cancell modelling and pick different shape or shange its colour - press ESC key while modelling. Then repeat step 2 from its start.
-3. When shape is placed on the canvas use Mouse scroll Up/Down to Zoom In/Out.
-3. To drag the whole picture over the canvas press middle mouse button, hold it and move mouse in the direction you want. Relase the middle mouse button to set the new place for the drawing at the canvas.
+2. Draw a shape by clicking once on the canvas, then move mouse and watch how shape's sketch chages its size. Make second click when you're satisfied with the size and place. This is called modelling process. If you decide to cancell modelling and pick another shape or shange its colour - press ESC key while modelling. Then repeat this step from beginning.
+3. When shape has been placed on the canvas use Mouse scroll Up/Down to Zoom In/Out.
+3. To drag the whole picture over the canvas press middle mouse button, hold it and move mouse in the direction you want. Relase the middle mouse button to set the new place for the drawing at the canvas. Alternatively, you can also use arrow buttons on UI, under the `Offset` display.
+
+For quick "check and look around" you can use below code "short cut" in your browser's dev-tools console:
+```javascript
+stage.clearAndReset();
+let rectangle = new Rectangle();
+let circle = new Circle();
+stage.main.draw(rectangle, {x:50, y:350, w:200, h: 100});
+stage.main.draw(circle, {x:150, y:400, r:2});
+
+stage.main.draw(circle, {x:600, y:100, r:80});
+stage.main.draw(circle, {x:600, y:100, r:2});
+```
