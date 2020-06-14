@@ -17,9 +17,16 @@ class Stage {
         this.init();
     }
 
+    get offset () { 
+        return {
+            x: this.stageOffset.x + this.zoomOffset.x,
+            y: this.stageOffset.y + this.zoomOffset.y
+        };
+    }
+
     init() {
         // initial offset value
-        this.offset = {x: 0, y: 0};
+        this.stageOffset = {x: 0, y: 0};
         this.zoomFactor = 1;
         this.zoomOffset = {x: 0, y: 0}
         this.zoomStep = 0.2;
@@ -38,10 +45,7 @@ class Stage {
         this.trace.context.setLineDash([1, 3]);
         this.model.context.setLineDash([1, 2]);
 
-        // Set/Update Zoom and Offset display:
-        $("input[name='ox']").val(this.offset.x);
-        $("input[name='oy']").val(this.offset.y);
-        $("input[name='z']").val(this.zoomFactor.toFixed(1));
+        this.updateZoomAndOffsetDisplay();
     }
 
     /**
@@ -99,8 +103,8 @@ class Stage {
     zoomIn(event) {
         this.zoomFactor += this.zoomStep;
         let props = {
-            x: (event.mousOver) ? event.x - this.offset.x: this.trace.canvas.width / 2,
-            y: (event.mousOver) ? event.y - this.offset.y: this.trace.canvas.height / 2,
+            x: (event.mousOver) ? event.x - this.stageOffset.x: this.trace.canvas.width / 2,
+            y: (event.mousOver) ? event.y - this.stageOffset.y: this.trace.canvas.height / 2,
             zoom: this.zoomFactor.toFixed(1)
         };
 
@@ -110,6 +114,8 @@ class Stage {
         props.zoomOffset = this.zoomOffset;
         
         this.main.setZoomFactor(props);
+        this.updateZoomAndOffsetDisplay();
+        
         return this.zoomFactor.toFixed(1);
     }
 
@@ -117,8 +123,8 @@ class Stage {
         if (this.zoomFactor > (2 * this.zoomStep)) {
             this.zoomFactor -= this.zoomStep;
             let props = {
-                x: (event.mousOver) ? event.x - this.offset.x: this.trace.canvas.width / 2,
-                y: (event.mousOver) ? event.y - this.offset.y: this.trace.canvas.height / 2,
+                x: (event.mousOver) ? event.x - this.stageOffset.x: this.trace.canvas.width / 2,
+                y: (event.mousOver) ? event.y - this.stageOffset.y: this.trace.canvas.height / 2,
                 zoom: this.zoomFactor.toFixed(1)
             };
     
@@ -128,7 +134,9 @@ class Stage {
             props.zoomOffset = this.zoomOffset;
 
             this.main.setZoomFactor(props);
+            this.updateZoomAndOffsetDisplay();
         }
+
         return this.zoomFactor.toFixed(1);
     }
 
@@ -138,13 +146,11 @@ class Stage {
      * @param {Number} y Pixels to shift the stage along the y axis
      */
     drag(x, y) {
-        this.offset.x += x;
-        this.offset.y += y;
+        this.stageOffset.x += x;
+        this.stageOffset.y += y;
 
-        this.main.drag(this.offset.x, this.offset.y);
-
-        $("input[name='ox']").val(this.offset.x);
-        $("input[name='oy']").val(this.offset.y);
+        this.main.drag(this.stageOffset.x, this.stageOffset.y);
+        this.updateZoomAndOffsetDisplay();
         
         return this.offset;
     }
@@ -154,9 +160,26 @@ class Stage {
      */
     center() {
         this.drag(
-            -1 * (this.offset.x + this.zoomOffset.x) + this.trace.canvas.width * ( 1- this.zoomFactor) / 2, 
-            -1 * (this.offset.y + this.zoomOffset.y) + this.trace.canvas.height * ( 1- this.zoomFactor) / 2
+            -1 * (this.stageOffset.x + this.zoomOffset.x) + this.trace.canvas.width * ( 1- this.zoomFactor) / 2, 
+            -1 * (this.stageOffset.y + this.zoomOffset.y) + this.trace.canvas.height * ( 1- this.zoomFactor) / 2
         );
+    }
+
+    updateZoomAndOffsetDisplay() {
+        $("#offset")
+            .find("div.display")
+            .find("[name='x']")
+            .get(0).innerText = String(Math.round(this.stageOffset.x + this.zoomOffset.x));
+
+        $("#offset")
+            .find("div.display")
+            .find("[name='y']")
+            .get(0).innerText = String(Math.round(this.stageOffset.y + this.zoomOffset.y));
+
+        $("#zoom")
+            .find("div.display")
+            .find("[name='z']")
+            .get(0).innerText = String(this.zoomFactor.toFixed(1));
     }
 
 }

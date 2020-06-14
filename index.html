@@ -38,27 +38,53 @@
     </div>
 
     <div class="toolbar-container">
+        
         <div class="shapes">
             <button id="circle" class="btn btn-circle" type="button" title="Circle"></button>
             <button id="ellipse" class="btn btn-ellipse" type="button" title="Ellipse"></button>
             <button id="square" class="btn btn-square" type="button" title="Rectangle"></button>
         </div>
-        <div class="vgap" style="margin-bottom: 15px;"></div>
-        <div class="tracer-display" id="trace">
-            <div class="tracer-position">
-                <label for="x" title="X coordinate">x:</label>
-                <input type="text" name="x" size="2"></input>
+        
+        <div class="vgap" style="margin-bottom: 10px;"></div>
+        
+        <div class="display-container" id="tracer">
+            <div>Coordinates:</div>
+            <div class="display">
+                <div class="label" title="X coordinate">x:</div>
+                <div class="value" name="x">0</div>
             </div>
-            <div class="tracer-position">
-                <label for="y" title="X coordinate">y:</label>
-                <input type="text" name="y" size="2"></input>
-            </div>
-            <div class="tracer-zoom">
-                <label for="z" title="Zoom factor">z:</label>
-                <input type="text" name="z" size="2"></input>
+            <div class="display">
+                <div class="label" title="Y coordinate">y:</div>
+                <div class="value" name="y">0</div>
             </div>
         </div>
+
         <div class="vgap" style="margin-bottom: 15px;"></div>
+        
+        <div class="display-container" id="zoom">
+            <div>Zoom:</div>
+            <div class="display">
+                <div class="label" title="Zoom factor">z:</div>
+                <div class="value" name="z"></div>
+            </div>
+        </div>
+
+        <div class="vgap" style="margin-bottom: 15px;"></div>
+        
+        <div class="display-container" id="offset">
+            <div>Offset:</div>
+            <div class="display">
+                <div class="label" title="offset by X axis">x:</div>
+                <div class="value" name="x"></div>
+            </div>
+            <div class="display">
+                <div class="label" title="offset by Y axis">y:</div>
+                <div class="value" name="y"></div>
+            </div>
+        </div>
+        
+        <div class="vgap" style="margin-bottom: 15px;"></div>
+        
         <div class="move-controls">
             <div class="move-control"></div>
             <div class="move-control">
@@ -82,18 +108,9 @@
             </div>
             <div class="move-control"></div>
         </div>
-        <div class="vgap" style="margin-bottom: 15px;"></div>
-        <div class="tracer-display" id="offset">
-            <div class="tracer-position">
-                <label for="ox" title="Current offset by X axis">x:</label>
-                <input type="text" name="ox" size="2"></input>
-            </div>
-            <div class="tracer-position">
-                <label for="oy" title="Current offset by Y axis">y:</label>
-                <input type="text" name="oy" size="2"></input>
-            </div>
-        </div>
-        <div class="vgap" style="margin-bottom: auto;"></div>
+        
+        <div class="vgap" style="margin-bottom:auto; align-self:stretch;"></div>
+        
         <div class="actions">
             <button id="clear" class="btn-clear" type="button">Clear</button>
         </div>

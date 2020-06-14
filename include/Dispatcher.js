@@ -93,9 +93,17 @@ class Dispatcher {
      * This is an internal method, not supposed to be called from outside, for now.
      */
     trace() {
-        $("input[name='x']").val(this.mouseTracker.x - this.stage.offset.x);
-        $("input[name='y']").val(this.mouseTracker.y - this.stage.offset.y);
-        this.stage.trace.clear();
+        $("#tracer")
+            .find("div.display")
+            .find("[name='x']")
+            .get(0).innerText = Math.round((this.mouseTracker.x - this.stage.offset.x) / this.stage.zoomFactor)
+        
+        $("#tracer")
+            .find("div.display")
+            .find("[name='y']")
+            .get(0).innerText = Math.round((this.mouseTracker.y - this.stage.offset.y) / this.stage.zoomFactor)
+        
+            this.stage.trace.clear();
         this.stage.trace.sketch(this.tracer, {start: this.mouseTracker.current});
         
         // Optional return. Just to let the client know that method has worked fine.

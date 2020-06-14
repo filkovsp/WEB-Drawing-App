@@ -95,7 +95,7 @@ button {
     width: 100px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -104,20 +104,34 @@ button {
     flex-direction: column;
 }
 
-.tracer-display {
+.display-container {
     display: flex;
     flex-direction: column;
 }
 
-.tracer-display > div {
+.display-container > div {
+    font-size: small;
+}
+
+.display-container > .display {
     display: flex;
     flex-direction: row;
     margin-top: 5px;
-    margin-left: 10px;
+    margin-left: 5px;
 }
 
-.tracer-display > div > label {
+.display-container > .display > .label {
     margin-right: 5px;
+    font-size: 0.9em;
+    padding: 2px;
+}
+
+.display-container > .display > .value {
+    width: 45px; 
+    border-radius: 3px;
+    border: 1px solid #a0a0a0; 
+    font-size: 0.9em;
+    padding: 2px;
 }
 
 .move-controls {
