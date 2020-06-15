@@ -70,8 +70,8 @@ export default class Layer {
      * @param {Number} y Position offset by Y axis
      */
     drag(x, y) {
-        this.stageOffset.x = x;
-        this.stageOffset.y = y;
+        this.offset.x = x;
+        this.offset.y = y;
         
         this.clear(true);
         this.context.save();
@@ -107,7 +107,7 @@ export default class Layer {
      * Full reset of that drawing area and context.
      */
     clearAndReset() {
-        this.stageOffset = {x: 0, y: 0};
+        this.offset = {x: 0, y: 0};
         this.zoomFactor = 1;
         this.clear(false);
         this.context.resetTransform();
