@@ -136,21 +136,21 @@
     import {Dispatcher} from "./include/Dispatcher.js";
     import * as Shape from "./include/Shape.js";
 
-    /**
-     * TODO:
-     * use Factory pattern here, or (probably) inside the Dispatcher
-     */
-    var stage = new Stage(
-        $("#stage").find("#main").get(0), 
-        $("#stage").find("#model").get(0), 
-        $("#stage").find("#trace").get(0));
-
-    var dispatcher = new Dispatcher(stage);
-    var shape = new Shape.AbstractShape();
-    var color = undefined;
-
     $(document).ready( () => {
-        
+
+        /**
+         * TODO:
+         * use Factory pattern here, or (probably) inside the Dispatcher
+         */
+        var stage = new Stage(
+            $("#stage").find("#main").get(0), 
+            $("#stage").find("#model").get(0), 
+            $("#stage").find("#trace").get(0));
+
+        var dispatcher = new Dispatcher(stage);
+        var shape = new Shape.AbstractShape();
+        var color = undefined;
+
         /**
          * Make this looking fancier.
          * with some sort of JQuery UI plugin.
