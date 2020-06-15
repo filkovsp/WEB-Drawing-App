@@ -10,7 +10,6 @@ export default class Layer {
         this.context = canvas.getContext('2d');
         this.shapes = Array();        
         this.zoomFactor = 1;
-        // this.zoomOffset = {x: 0, y: 0};
         this.offset = {x: 0, y: 0};
     }
 
@@ -45,6 +44,7 @@ export default class Layer {
     
     setZoomFactor(props) {
         this.offset = props.offset;
+        this.zoomFactor = props.zoom;
 
         this.clear(true);
         this.context.save();
