@@ -11,7 +11,7 @@ export default class Layer {
         this.shapes = Array();        
         this.zoomFactor = 1;
         this.zoomOffset = {x: 0, y: 0};
-        this.offset = {x: 0, y: 0};
+        this.stageOffset = {x: 0, y: 0};
     }
 
     /**
@@ -37,8 +37,8 @@ export default class Layer {
         props = this.sketch(shape, props);
         
         props.offset = {
-            x: this.offset.x + this.zoomOffset.x,
-            y: this.offset.y + this.zoomOffset.y
+            x: this.stageOffset.x + this.zoomOffset.x,
+            y: this.stageOffset.y + this.zoomOffset.y
         };
         props.zoom = this.zoomFactor;
         props = shape.validateProps(props);
@@ -55,8 +55,8 @@ export default class Layer {
         let matrix = this.context.getTransform();
         matrix.a = Math.sign(matrix.a) * props.zoom;
         matrix.d = Math.sign(matrix.a) * props.zoom;
-        matrix.e = this.offset.x + props.zoomOffset.x;
-        matrix.f = this.offset.y + props.zoomOffset.y;
+        matrix.e = this.stageOffset.x + props.zoomOffset.x;
+        matrix.f = this.stageOffset.y + props.zoomOffset.y;
         
         this.context.setTransform(matrix);
         
@@ -73,8 +73,8 @@ export default class Layer {
      * @param {Number} y Position offset by Y axis
      */
     drag(x, y) {
-        this.offset.x = x;
-        this.offset.y = y;
+        this.stageOffset.x = x;
+        this.stageOffset.y = y;
         
         this.clear(true);
         this.context.save();
@@ -82,8 +82,8 @@ export default class Layer {
         let matrix = this.context.getTransform();
         matrix.a = Math.sign(matrix.a) * this.zoomFactor;
         matrix.d = Math.sign(matrix.a) * this.zoomFactor;
-        matrix.e = this.offset.x + this.zoomOffset.x;
-        matrix.f = this.offset.y + this.zoomOffset.y;
+        matrix.e = this.stageOffset.x + this.zoomOffset.x;
+        matrix.f = this.stageOffset.y + this.zoomOffset.y;
         
         this.context.setTransform(matrix);
         
@@ -110,7 +110,7 @@ export default class Layer {
      * Full reset of that drawing area and context.
      */
     clearAndReset() {
-        this.offset = {x: 0, y: 0};
+        this.stageOffset = {x: 0, y: 0};
         this.zoomFactor = 1;
         this.clear(false);
         this.context.resetTransform();
