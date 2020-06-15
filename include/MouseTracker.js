@@ -1,4 +1,4 @@
-class MouseTracker {
+export default class MouseTracker {
     constructor () {
         this.current = {x: 0, y: 0};
         this.previous = {x: 0, y: 0};
@@ -81,3 +81,5 @@ class MouseTracker {
     }
 
 }
+
+export {MouseTracker};

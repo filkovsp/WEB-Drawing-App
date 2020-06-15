@@ -3,7 +3,8 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
  * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
  */
-class Layer {
+
+export default class Layer {
     constructor(canvas) {
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
@@ -116,3 +117,4 @@ class Layer {
     }
 }
 
+export {Layer}

@@ -11,7 +11,7 @@
  * Shape is an Abstract Class, should not be instanciated directly.
  * But one of the clases below that extend Shape must be used for drawing a particular shape.
  */
-class Shape {
+export default class AbstractShape {
     constructor() {
         this.color = "rgb(0, 0, 0)";
         this.fillColor = "rgb(0, 0, 0)";
@@ -92,7 +92,7 @@ class Shape {
  * Set of concrete classes below 
  * that each reperesents a perticular shape on a layer.
  -------------------------------------------------------------------------*/
-class Circle extends Shape {
+class Circle extends AbstractShape {
     constructor() {
         super();
     }    
@@ -155,7 +155,7 @@ class Circle extends Shape {
     }
 }
 
-class Ellipse extends Shape {
+class Ellipse extends AbstractShape {
     constructor() {
         super();
     }
@@ -218,7 +218,7 @@ class Ellipse extends Shape {
     }
 }
 
-class Rectangle extends Shape {
+class Rectangle extends AbstractShape {
     constructor() {
         super();
     }
@@ -277,7 +277,7 @@ class Rectangle extends Shape {
     }
 }
 
-class Grid extends Shape {
+class Grid extends AbstractShape {
     constructor() {
         super();
     }
@@ -322,7 +322,7 @@ class Grid extends Shape {
     }
 }
 
-class Trace extends Shape {
+class Trace extends AbstractShape {
     constructor() {
         super();
     }
@@ -356,3 +356,6 @@ class Trace extends Shape {
         return props;
     }
 }
+
+export {AbstractShape, Circle, Rectangle, Ellipse};
+export {Grid, Trace};

@@ -9,8 +9,12 @@
  *   - trace layer - decorating layer, just to make fancy cross horizontal and vertical lines, crossing at the mouse pointer.
  * 
  */
-class Stage {
+import {Subject} from './Abstraction.js';
+import {Layer} from './Layer.js';
+
+export default class Stage extends Subject {
     constructor(main, model, trace) {
+        super();
         this.main = new Layer(main);
         this.model = new Layer(model);
         this.trace = new Layer(trace);
@@ -44,8 +48,6 @@ class Stage {
         // Decorate line styles for tarcing and modelling layers:
         this.trace.context.setLineDash([1, 3]);
         this.model.context.setLineDash([1, 2]);
-
-        this.updateZoomAndOffsetDisplay();
     }
 
     /**
@@ -114,9 +116,13 @@ class Stage {
         props.zoomOffset = this.zoomOffset;
         
         this.main.setZoomFactor(props);
-        this.updateZoomAndOffsetDisplay();
-        
-        return this.zoomFactor.toFixed(1);
+
+        this.notifyAll({
+            offset: {
+                x: Math.round(this.stageOffset.x + this.zoomOffset.x),
+                y: Math.round(this.stageOffset.y + this.zoomOffset.y)
+            }, z : this.zoomFactor.toFixed(1)
+        });
     }
 
     zoomOut(event) {
@@ -134,10 +140,14 @@ class Stage {
             props.zoomOffset = this.zoomOffset;
 
             this.main.setZoomFactor(props);
-            this.updateZoomAndOffsetDisplay();
-        }
 
-        return this.zoomFactor.toFixed(1);
+            this.notifyAll({
+                offset: {
+                    x: Math.round(this.stageOffset.x + this.zoomOffset.x),
+                    y: Math.round(this.stageOffset.y + this.zoomOffset.y)
+                }, z : this.zoomFactor.toFixed(1)
+            });
+        }
     }
 
     /**
@@ -150,9 +160,13 @@ class Stage {
         this.stageOffset.y += y;
 
         this.main.drag(this.stageOffset.x, this.stageOffset.y);
-        this.updateZoomAndOffsetDisplay();
         
-        return this.offset;
+        this.notifyAll({
+            offset: {
+                x: Math.round(this.stageOffset.x + this.zoomOffset.x),
+                y: Math.round(this.stageOffset.y + this.zoomOffset.y)
+            }, z : this.zoomFactor.toFixed(1)
+        });
     }
 
     /**
@@ -165,21 +179,5 @@ class Stage {
         );
     }
 
-    updateZoomAndOffsetDisplay() {
-        $("#offset")
-            .find("div.display")
-            .find("[name='x']")
-            .get(0).innerText = String(Math.round(this.stageOffset.x + this.zoomOffset.x));
-
-        $("#offset")
-            .find("div.display")
-            .find("[name='y']")
-            .get(0).innerText = String(Math.round(this.stageOffset.y + this.zoomOffset.y));
-
-        $("#zoom")
-            .find("div.display")
-            .find("[name='z']")
-            .get(0).innerText = String(this.zoomFactor.toFixed(1));
-    }
-
 }
+export {Stage};

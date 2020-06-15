@@ -10,7 +10,11 @@
  *      by second click we set the shape as complete and draw the same shape with final props 
  *      into the "main" layer and clear out the "model" layer.
  */
-class Dispatcher {
+import {Trace} from './Shape.js';
+import {Display} from './Display.js';
+import {MouseTracker} from './MouseTracker.js';
+
+export default class Dispatcher {
     constructor(stage) {
         this.stage = stage;
         this.init();
@@ -23,6 +27,12 @@ class Dispatcher {
         this.tracer = new Trace();
         this.tracer.setColor("rgb(150, 0, 0)");
         this.mouseTracker = new MouseTracker();
+        
+        let zoomAndOffset = new Display();
+        zoomAndOffset.addKey("x", $("#offset").find("div.display").find("[name='x']").get(0));
+        zoomAndOffset.addKey("y", $("#offset").find("div.display").find("[name='y']").get(0));
+        zoomAndOffset.addKey("z", $("#zoom").find("div.display").find("[name='z']").get(0));
+        this.stage.addObserver(zoomAndOffset);
     }
 
     /**
@@ -76,7 +86,7 @@ class Dispatcher {
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
     
             // TODO: implement Zoom in/out with mouse-wheel:
-            if (event.deltaY > 0) {
+            if (event.originalEvent.wheelDelta > 0) {
                 $("input[name='z']").val(this.stage.zoomIn(this.mouseTracker));
             } else {
                 $("input[name='z']").val(this.stage.zoomOut(this.mouseTracker));
@@ -103,10 +113,12 @@ class Dispatcher {
             .find("[name='y']")
             .get(0).innerText = Math.round((this.mouseTracker.y - this.stage.offset.y) / this.stage.zoomFactor)
         
-            this.stage.trace.clear();
+        this.stage.trace.clear();
         this.stage.trace.sketch(this.tracer, {start: this.mouseTracker.current});
         
         // Optional return. Just to let the client know that method has worked fine.
         return true;
     }
 }
+
+export {Dispatcher};

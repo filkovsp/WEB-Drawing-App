@@ -65,7 +65,7 @@
             <div>Zoom:</div>
             <div class="display">
                 <div class="label" title="Zoom factor">z:</div>
-                <div class="value" name="z"></div>
+                <div class="value" name="z">1.0</div>
             </div>
         </div>
 
@@ -75,11 +75,11 @@
             <div>Offset:</div>
             <div class="display">
                 <div class="label" title="offset by X axis">x:</div>
-                <div class="value" name="x"></div>
+                <div class="value" name="x">0</div>
             </div>
             <div class="display">
                 <div class="label" title="offset by Y axis">y:</div>
-                <div class="value" name="y"></div>
+                <div class="value" name="y">0</div>
             </div>
         </div>
         
@@ -117,25 +117,34 @@
     </div>
 
 </div>
+<!--
+    <script src="include/Abstraction.js"></script>
+    <script src="include/Display.js"></script>
+    <script src="include/Shape.js"></script>
+    <script src="include/Dispatcher.js"></script>
+    <script src="include/Layer.js"></script>
+    <script src="include/Stage.js"></script>
+    <script src="include/MouseTracker.js"></script>
+    <script src="include/jquery.mousewheel.js"></script>
+-->
 
+<script type="module">
 
-<script src="include/Shape.js"></script>
-<script src="include/Dispatcher.js"></script>
-<script src="include/Layer.js"></script>
-<script src="include/Stage.js"></script>
-<script src="include/MouseTracker.js"></script>
-<script src="include/jquery.mousewheel.js"></script>
-    
+    import {Stage} from "./include/Stage.js";
+    import {Dispatcher} from "./include/Dispatcher.js";
+    import * as Shape from "./include/Shape.js";
 
-<script>
-
+    /**
+     * TODO:
+     * use Factory pattern here, or (probably) inside the Dispatcher
+     */
     var stage = new Stage(
         $("#stage").find("#main").get(0), 
         $("#stage").find("#model").get(0), 
         $("#stage").find("#trace").get(0));
 
     var dispatcher = new Dispatcher(stage);
-    var shape = new Shape();
+    var shape = new Shape.AbstractShape();
     var color = undefined;
 
     $(document).ready( () => {
@@ -196,17 +205,17 @@
          * Event handlers for shape-buttons
          */
         $("#circle").on("click", (event) => {
-            shape = new Circle();
+            shape = new Shape.Circle();
             shape.setColor(color);
         });
 
         $("#ellipse").on("click", (event) => {
-            shape = new Ellipse();
+            shape = new Shape.Ellipse();
             shape.setColor(color);
         });
 
         $("#square").on("click", (event) => {
-            shape = new Rectangle();
+            shape = new Shape.Rectangle();
             shape.setColor(color);
         });
 
