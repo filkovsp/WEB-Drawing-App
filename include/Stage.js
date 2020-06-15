@@ -9,7 +9,7 @@
  *   - trace layer - decorating layer, just to make fancy cross horizontal and vertical lines, crossing at the mouse pointer.
  * 
  */
-import {Subject} from './Abstraction.js';
+import {Subject} from './Observer.js';
 import {Layer} from './Layer.js';
 
 export default class Stage extends Subject {

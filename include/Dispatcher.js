@@ -10,12 +10,13 @@
  *      by second click we set the shape as complete and draw the same shape with final props 
  *      into the "main" layer and clear out the "model" layer.
  */
-import {Trace} from './Shape.js';
-import {Display} from './Display.js';
-import {MouseTracker} from './MouseTracker.js';
+import {Trace} from "./Shape.js";
+import {MouseTracker} from "./MouseTracker.js";
+import {Subject} from "./Observer.js";
 
-export default class Dispatcher {
+export default class Dispatcher extends Subject{
     constructor(stage) {
+        super();
         this.stage = stage;
         this.init();
     }
@@ -27,12 +28,6 @@ export default class Dispatcher {
         this.tracer = new Trace();
         this.tracer.setColor("rgb(150, 0, 0)");
         this.mouseTracker = new MouseTracker();
-        
-        let zoomAndOffset = new Display();
-        zoomAndOffset.addKey("x", $("#offset").find("div.display").find("[name='x']").get(0));
-        zoomAndOffset.addKey("y", $("#offset").find("div.display").find("[name='y']").get(0));
-        zoomAndOffset.addKey("z", $("#zoom").find("div.display").find("[name='z']").get(0));
-        this.stage.addObserver(zoomAndOffset);
     }
 
     /**
@@ -50,7 +45,7 @@ export default class Dispatcher {
          * TODO:
          * consider implementing the logic below with Observer and/or Command patterns.
          */
-        if (event.type == "click" && shape.constructor.name == "Shape" && this.mouseTracker.button == "left") {
+        if (event.type == "click" && shape.constructor.name == "AbstractShape" && this.mouseTracker.button == "left") {
             this.mouseTracker.resetClickCount();
             alert("Pick a Shape from the tool bar!");
             // Optional return.
@@ -87,9 +82,9 @@ export default class Dispatcher {
     
             // TODO: implement Zoom in/out with mouse-wheel:
             if (event.originalEvent.wheelDelta > 0) {
-                $("input[name='z']").val(this.stage.zoomIn(this.mouseTracker));
+                this.stage.zoomIn(this.mouseTracker)
             } else {
-                $("input[name='z']").val(this.stage.zoomOut(this.mouseTracker));
+                this.stage.zoomOut(this.mouseTracker)
             }
         } else if (event.type == "mouseout") {
             this.stage.trace.clear();
@@ -103,16 +98,11 @@ export default class Dispatcher {
      * This is an internal method, not supposed to be called from outside, for now.
      */
     trace() {
-        $("#tracer")
-            .find("div.display")
-            .find("[name='x']")
-            .get(0).innerText = Math.round((this.mouseTracker.x - this.stage.offset.x) / this.stage.zoomFactor)
-        
-        $("#tracer")
-            .find("div.display")
-            .find("[name='y']")
-            .get(0).innerText = Math.round((this.mouseTracker.y - this.stage.offset.y) / this.stage.zoomFactor)
-        
+        this.notifyAll({
+            x: Math.round((this.mouseTracker.x - this.stage.offset.x) / this.stage.zoomFactor),
+            y: Math.round((this.mouseTracker.y - this.stage.offset.y) / this.stage.zoomFactor)
+        });
+
         this.stage.trace.clear();
         this.stage.trace.sketch(this.tracer, {start: this.mouseTracker.current});
         

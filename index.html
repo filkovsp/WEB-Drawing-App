@@ -47,7 +47,7 @@
         
         <div class="vgap" style="margin-bottom: 10px;"></div>
         
-        <div class="display-container" id="tracer">
+        <div class="display-container" id="position">
             <div>Coordinates:</div>
             <div class="display">
                 <div class="label" title="X coordinate">x:</div>
@@ -117,20 +117,11 @@
     </div>
 
 </div>
-<!--
-    <script src="include/Abstraction.js"></script>
-    <script src="include/Display.js"></script>
-    <script src="include/Shape.js"></script>
-    <script src="include/Dispatcher.js"></script>
-    <script src="include/Layer.js"></script>
-    <script src="include/Stage.js"></script>
-    <script src="include/MouseTracker.js"></script>
-    <script src="include/jquery.mousewheel.js"></script>
--->
 
 <script type="module">
 
     import {Stage} from "./include/Stage.js";
+    import {Display} from "./include/Display.js";
     import {Dispatcher} from "./include/Dispatcher.js";
     import * as Shape from "./include/Shape.js";
 
@@ -250,10 +241,6 @@
         /**
          * Dragging with buttons:
          */
-
-        $("input[name='ox']").val(0);
-        $("input[name='oy']").val(0);
-
         $("#move-up").on("click", () => {
             stage.drag(0, -50);
         });
@@ -273,6 +260,18 @@
         $("#move-center").on("click", () => {
              stage.center();
         });
+
+
+        let xyDisplay = new Display();
+        xyDisplay.addKey("x", $("#position").find("div.display").find("[name='x']").get(0));
+        xyDisplay.addKey("y", $("#position").find("div.display").find("[name='y']").get(0));
+        dispatcher.addObserver(xyDisplay);
+        
+        let zoDiplay = new Display();
+        zoDiplay.addKey("x", $("#offset").find("div.display").find("[name='x']").get(0));
+        zoDiplay.addKey("y", $("#offset").find("div.display").find("[name='y']").get(0));
+        zoDiplay.addKey("z", $("#zoom").find("div.display").find("[name='z']").get(0));
+        stage.addObserver(zoDiplay);
 
     });
 </script>
