@@ -119,7 +119,18 @@
 </div>
 
 <script type="module">
-
+    /**
+     * Since ES6, Javascript Supports import/export statements:
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export
+     * 
+     * limitation:
+     * this doesn't work without a web server. If we want to import anything below,
+     * the index.html must be openned through a web-server, not as local file.
+     * More theory here: https://web.dev/cross-origin-resource-sharing/
+     * In Chrome it is possible to use "Web Server for Chrome" extention, or
+     * on VS Code - "Live Server" extention.
+     */
     import {Stage} from "./include/Stage.js";
     import {Display} from "./include/Display.js";
     import {Dispatcher} from "./include/Dispatcher.js";
@@ -261,7 +272,10 @@
              stage.center();
         });
 
-
+        /**
+         * create 2 Display objects and assign them for notifications from
+         * Stage and Dispatcher.MouseTracker.
+         */
         let xyDisplay = new Display();
         xyDisplay.addKey("x", $("#position").find("div.display").find("[name='x']").get(0));
         xyDisplay.addKey("y", $("#position").find("div.display").find("[name='y']").get(0));
