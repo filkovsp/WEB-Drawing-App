@@ -113,7 +113,10 @@ export default class Stage extends Subject {
         this.zoomOffset.x -= (props.x - this.zoomOffset.x) / (this.zoomFactor - this.zoomStep) * this.zoomStep;
         this.zoomOffset.y -= (props.y - this.zoomOffset.y ) / (this.zoomFactor - this.zoomStep) * this.zoomStep;
 
-        props.zoomOffset = this.zoomOffset;
+        props.offset = {
+            x: this.stageOffset.x + this.zoomOffset.x,
+            y: this.stageOffset.y + this.zoomOffset.y
+        };
         
         this.main.setZoomFactor(props);
 
@@ -137,7 +140,10 @@ export default class Stage extends Subject {
             this.zoomOffset.x += (props.x - this.zoomOffset.x) / (this.zoomFactor + this.zoomStep) * this.zoomStep;
             this.zoomOffset.y += (props.y - this.zoomOffset.y ) / (this.zoomFactor + this.zoomStep) * this.zoomStep;
 
-            props.zoomOffset = this.zoomOffset;
+            props.offset = {
+                x: this.stageOffset.x + this.zoomOffset.x,
+                y: this.stageOffset.y + this.zoomOffset.y
+            };
 
             this.main.setZoomFactor(props);
 
@@ -159,7 +165,10 @@ export default class Stage extends Subject {
         this.stageOffset.x += x;
         this.stageOffset.y += y;
 
-        this.main.drag(this.stageOffset.x, this.stageOffset.y);
+        this.main.drag(
+            this.stageOffset.x + this.zoomOffset.x, 
+            this.stageOffset.y + this.zoomOffset.y
+        );
         
         this.notifyAll({
             offset: {
