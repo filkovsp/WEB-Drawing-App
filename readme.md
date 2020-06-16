@@ -21,12 +21,5 @@ This relates to my version of the app: [WEB-Drawing-App](https://filkovsp.github
 
 For quick "check and look around" you can use below code "short cut" in your browser's dev-tools console:
 ```javascript
-stage.clearAndReset();
-let rectangle = new Rectangle();
-let circle = new Circle();
-stage.main.draw(rectangle, {x:50, y:350, w:200, h: 100});
-stage.main.draw(circle, {x:150, y:400, r:2});
-
-stage.main.draw(circle, {x:600, y:100, r:80});
-stage.main.draw(circle, {x:600, y:100, r:2});
+$("#draw-button").click();
 ```

@@ -91,7 +91,7 @@ button {
     flex-direction: column;
 }
 
-.toolbar-container {
+.toolbar-container, .actions {
     width: 100px;
     display: flex;
     flex-direction: column;

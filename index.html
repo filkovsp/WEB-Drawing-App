@@ -135,21 +135,21 @@
     import {Display} from "./include/Display.js";
     import {Dispatcher} from "./include/Dispatcher.js";
     import * as Shape from "./include/Shape.js";
-
+    
     $(document).ready( () => {
-
         /**
          * TODO:
          * use Factory pattern here, or (probably) inside the Dispatcher
          */
-        var stage = new Stage(
+        const stage = new Stage(
             $("#stage").find("#main").get(0), 
             $("#stage").find("#model").get(0), 
             $("#stage").find("#trace").get(0));
 
-        var dispatcher = new Dispatcher(stage);
-        var shape = new Shape.AbstractShape();
-        var color = undefined;
+        const dispatcher = new Dispatcher(stage);
+
+        let shape = new Shape.AbstractShape();
+        let color = undefined;
 
         /**
          * Make this looking fancier.
@@ -286,6 +286,33 @@
         zoDiplay.addKey("y", $("#offset").find("div.display").find("[name='y']").get(0));
         zoDiplay.addKey("z", $("#zoom").find("div.display").find("[name='z']").get(0));
         stage.addObserver(zoDiplay);
+
+        /**
+         * This peice of code stands for testing purpose only.
+         * It creates hidden buttton which could be clocked virtually
+         * by code in browser's dev-console:
+         * 
+         * $("#draw-button").click();
+         * 
+         * more about creating DOM elements in JQuery here: 
+         * https://api.jquery.com/jquery/#entry-examples-1
+         */
+        $( "<button/>", {
+            "class": "btn-clear",
+            "id": "draw-button",
+            "text": "Draw",
+            "style": "display: none;",
+            "click": function() {
+                    stage.clearAndReset();
+                    let rectangle = new Shape.Rectangle();
+                    let circle = new Shape.Circle();
+                    stage.main.draw(rectangle, {x:50, y:350, w:200, h: 100});
+                    stage.main.draw(circle, {x:150, y:400, r:2});
+
+                    stage.main.draw(circle, {x:600, y:100, r:80});
+                    stage.main.draw(circle, {x:600, y:100, r:2});
+            }
+        }).appendTo($(".actions").get(0));
 
     });
 </script>
