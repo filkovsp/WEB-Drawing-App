@@ -23,3 +23,8 @@ For quick "check and look around" you can use below code "short cut" in your bro
 ```javascript
 $("#draw-button").click();
 ```
+
+### Browser Compatability
+I've started to use JavaScript ES6 specification here with Import / Export statements. This is not widely supported by all browsers. So, you might wanna check if your browser supports it following the links below:
+- [import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
+- [export](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export)
