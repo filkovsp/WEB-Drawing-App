@@ -99,8 +99,8 @@ export default class Dispatcher extends Subject{
      */
     trace() {
         this.notifyAll({
-            x: Math.round((this.mouseTracker.x - this.stage.offset.x) / this.stage.zoomFactor),
-            y: Math.round((this.mouseTracker.y - this.stage.offset.y) / this.stage.zoomFactor)
+            x: Math.round(this.mouseTracker.x - this.stage.offset.x),
+            y: Math.round(this.mouseTracker.y - this.stage.offset.y)
         });
 
         this.stage.trace.clear();
