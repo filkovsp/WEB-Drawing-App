@@ -79,7 +79,7 @@ export default class Dispatcher extends Subject{
             this.stage.model.clear();
             this.mouseTracker.resetClickCount();
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
-            if (event.originalEvent.wheelDelta > 0) {
+            if (event.originalEvent.wheelDeltaY > 0) {
                 this.stage.zoomIn(this.mouseTracker);
             } else {
                 this.stage.zoomOut(this.mouseTracker);
