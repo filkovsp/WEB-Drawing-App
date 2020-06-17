@@ -79,12 +79,10 @@ export default class Dispatcher extends Subject{
             this.stage.model.clear();
             this.mouseTracker.resetClickCount();
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
-    
-            // TODO: implement Zoom in/out with mouse-wheel:
             if (event.originalEvent.wheelDelta > 0) {
-                this.stage.zoomIn(this.mouseTracker)
+                this.stage.zoomIn(this.mouseTracker);
             } else {
-                this.stage.zoomOut(this.mouseTracker)
+                this.stage.zoomOut(this.mouseTracker);
             }
         } else if (event.type == "mouseout") {
             this.stage.trace.clear();
@@ -104,7 +102,7 @@ export default class Dispatcher extends Subject{
         });
 
         this.stage.trace.clear();
-        this.stage.trace.sketch(this.tracer, {start: this.mouseTracker.current});
+        this.stage.trace.sketch(this.tracer, this.mouseTracker.current);
         
         // Optional return. Just to let the client know that method has worked fine.
         return true;

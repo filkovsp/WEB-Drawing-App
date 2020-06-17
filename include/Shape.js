@@ -255,7 +255,8 @@ class Rectangle extends AbstractShape {
     }
 
     /**
-     * 
+     * Gets object `props` with two fields in it (objects): start{x, y} & end{x, y}
+     * Returns object with shape-specific coordinates: {x, y, w, h}
      * @param {Object} props 
      */
     getPropsFromCoordinates(props) {
@@ -277,6 +278,7 @@ class Rectangle extends AbstractShape {
     }
 }
 
+// TODO: Take in account Zoom and Offset
 class Grid extends AbstractShape {
     constructor() {
         super();
@@ -288,36 +290,24 @@ class Grid extends AbstractShape {
      * @param {Object} props Reserved container for additiona params
      */
     draw(layer, props) {
-
-        layer.context.strokeStyle = this.color;
-        layer.context.lineWidth = 2.5;
-        layer.context.beginPath();
-        layer.context.moveTo(vwp.min.x, 0);
-        layer.context.lineTo(vwp.max.x, 0);
-        layer.context.moveTo(0, vwp.min.y);
-        layer.context.lineTo(0, vwp.max.y);
-        layer.context.stroke();
-
         layer.context.strokeStyle = "rgb(200, 200, 230)";
         layer.context.lineWidth = 0.05;
-        layer.context.beginPath();
         let step = 50;
-        for (let x = step; x < vwp.max.x; x += step) {
-            layer.context.moveTo(x, vwp.min.y);
-            layer.context.lineTo(x, vwp.max.y);
-            layer.context.stroke();
-            layer.context.moveTo(-x, vwp.min.y);
-            layer.context.lineTo(-x, vwp.max.y);
+        
+        // Vertical lines:
+        layer.context.beginPath();
+        for (let x = step; x < this.canvas.width; x += step) {
+            layer.context.moveTo(x, 0);
+            layer.context.lineTo(x, this.canvas.height);
             layer.context.stroke();
         }
-
-        for (let y = step; y < vwp.max.y; y += step) {
-            layer.context.moveTo(vwp.min.x, y);
-            layer.context.lineTo(vwp.max.x, y);
+        // Horizontal lines:
+        layer.context.beginPath();
+        for (let y = step; y < this.canvas.height; y += step) {
+            layer.context.moveTo(0, y);
+            layer.context.lineTo(this.canvas.width, y);
             layer.context.stroke();
-            layer.context.moveTo(vwp.min.x, -y);
-            layer.context.lineTo(vwp.max.x, -y);
-            layer.context.stroke();
+   
         }
     }
 }
@@ -334,7 +324,9 @@ class Trace extends AbstractShape {
      * @param {Object} props Object containing properties {x, y}
      */
     draw(layer, props) {
-        props = this.validateProps(props);
+        if(!["x", "y"].every(key => Object.keys(props).includes(key))) {
+            props = this.validateProps(props);
+        }
         layer.context.beginPath();
         layer.context.strokeStyle = this.color;
         layer.context.moveTo(props.x, 0);
@@ -345,14 +337,23 @@ class Trace extends AbstractShape {
         
         // drop default properties.
         delete props.offset;
-        delete props.start;
-        delete props.end;
+        delete props.zoom;
         return props;
     }
-
+    
+    /**
+     * Gets object `props` with two fields in it (objects): start{x, y} & end{x, y}
+     * Returns object with shape-specific coordinates: {x, y}
+     * @param {Object} props 
+     */
     getPropsFromCoordinates(props) {
-        props.x = props.start.x;
-        props.y = props.start.y;
+        if(["start"].every(key => Object.keys(props).includes(key))) {
+            props.x = props.start.x;
+            props.y = props.start.y;
+
+            delete props.start;
+            delete props.end;        
+        }
         return props;
     }
 }
