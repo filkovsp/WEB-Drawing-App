@@ -22,7 +22,7 @@ export default class Layer {
      * @param {Object} props 
      */
     sketch(props) {
-        return this.#app
+        this.#app
             .shape(props.shape)
             .draw(this, props);
     }
