@@ -10,14 +10,16 @@
  *      by second click we set the shape as complete and draw the same shape with final props 
  *      into the "main" layer and clear out the "model" layer.
  */
-import {Trace} from "./Shape.js";
 import {MouseTracker} from "./MouseTracker.js";
 import {Subject} from "./Observer.js";
 
 export default class Dispatcher extends Subject{
-    constructor(stage) {
+    #tracer;
+    #app;
+
+    constructor(app) {
         super();
-        this.stage = stage;
+        this.#app = app;
         this.init();
     }
 
@@ -25,8 +27,6 @@ export default class Dispatcher extends Subject{
      * This is an internal method, not supposed to be called from outside, for now.
      */
     init() {
-        this.tracer = new Trace();
-        this.tracer.setColor("rgb(150, 0, 0)");
         this.mouseTracker = new MouseTracker();
     }
 
@@ -34,9 +34,9 @@ export default class Dispatcher extends Subject{
      * This is the only method that should be used from outside, by the client of this class.
      * The rest of methods in Dispatcher are for internal use only.
      * @param {Object} event 
-     * @param {Object} shape 
+     * @param {Object} props 
      */
-    dispatch(event, shape) {
+    dispatch(event, props) {
         event.preventDefault();
         this.mouseTracker.track(event);
         this.trace();
@@ -45,47 +45,44 @@ export default class Dispatcher extends Subject{
          * TODO:
          * consider implementing the logic below with Observer and/or Command patterns.
          */
-        if (event.type == "click" && shape.constructor.name == "AbstractShape" && this.mouseTracker.button == "left") {
+        if (event.type == "click" && this.mouseTracker.button == "left" && !props.shape) {
             this.mouseTracker.resetClickCount();
             alert("Pick a Shape from the tool bar!");
             // Optional return.
             return false;
         } else if (event.type == "click" && this.mouseTracker.button == "left") {
             if (this.mouseTracker.clickCount == 2) {
-                this.stage.model.clear();                
-                this.stage.main.draw(shape, {
-                    start: this.mouseTracker.start, 
-                    end: this.mouseTracker.end
-                });
+                props.start = this.mouseTracker.start;
+                props.end = this.mouseTracker.end;
+                
+                this.#app.layer("model").clear();
+                this.#app.layer("main").draw(props);
                 this.mouseTracker.resetClickCount();
             }
-        } else if (event.type == "mousemove" && this.mouseTracker.button != "middle") {
-            if(this.mouseTracker.clickCount > 0 && !this.mouseTracker.mouseDown) {
-                this.stage.model.clear();
-                
-                this.stage.model.sketch(shape, {
-                    start: this.mouseTracker.start, 
-                    end: this.mouseTracker.current
-                });
-            }
+        } else if (event.type == "mousemove" && this.mouseTracker.clickCount > 0 && !this.mouseTracker.mouseDown) {
+            props.start = this.mouseTracker.start;
+            props.end = this.mouseTracker.current;
+
+            this.#app.layer("model").clear();
+            this.#app.layer("model").sketch(props);
         } else if (event.type == "mousemove" && this.mouseTracker.button == "middle") {
             if (this.mouseTracker.mouseDown) {
-                this.stage.drag(
+                this.#app.stage.drag(
                     this.mouseTracker.moveDelta.x,
                     this.mouseTracker.moveDelta.y
                 );
             }
         } else if (event.type === "keyup" && event.key === "Escape") {
-            this.stage.model.clear();
+            this.#app.layer("model").clear();
             this.mouseTracker.resetClickCount();
         } else if (event.type == "mousewheel" && !this.mouseTracker.mouseDown) {
             if (event.originalEvent.wheelDeltaY > 0) {
-                this.stage.zoomIn(this.mouseTracker);
+                this.#app.stage.zoomIn(this.mouseTracker);
             } else {
-                this.stage.zoomOut(this.mouseTracker);
+                this.#app.stage.zoomOut(this.mouseTracker);
             }
         } else if (event.type == "mouseout") {
-            this.stage.trace.clear();
+            this.#app.layer("trace").clear();
         }
         
         // Optional return. Just to let the client know that method has worked fine.
@@ -97,12 +94,16 @@ export default class Dispatcher extends Subject{
      */
     trace() {
         this.notifyAll({
-            x: Math.round(this.mouseTracker.x - this.stage.offset.x),
-            y: Math.round(this.mouseTracker.y - this.stage.offset.y)
+            x: Math.round(this.mouseTracker.x - this.#app.stage.offset.x),
+            y: Math.round(this.mouseTracker.y - this.#app.stage.offset.y)
         });
 
-        this.stage.trace.clear();
-        this.stage.trace.sketch(this.tracer, this.mouseTracker.current);
+        this.#app.layer("trace").clear();
+        this.#app.layer("trace").sketch({
+            shape: "tracer",
+            color: "rgb(150, 0, 0)",
+            start: this.mouseTracker.current
+        });
         
         // Optional return. Just to let the client know that method has worked fine.
         return true;

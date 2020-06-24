@@ -13,11 +13,11 @@ import {Subject} from './Observer.js';
 import {Layer} from './Layer.js';
 
 export default class Stage extends Subject {
-    constructor(main, model, trace) {
+    #layers;
+
+    constructor(layers) {
         super();
-        this.main = new Layer(main);
-        this.model = new Layer(model);
-        this.trace = new Layer(trace);
+        this.#layers = layers;
         this.init();
     }
 
@@ -28,60 +28,49 @@ export default class Stage extends Subject {
         };
     }
 
+    get layers() {return this.#layers; }
+
     init() {
+
         // initial offset value
         this.stageOffset = {x: 0, y: 0};
         this.zoomFactor = 1;
         this.zoomOffset = {x: 0, y: 0}
         this.zoomStep = 0.2;
 
-        // Default layers:
-        this.layers = new Array();
-        this.addLayer(this.trace);
-        this.addLayer(this.model);
-        this.addLayer(this.main);
-
         // tracing and modelling layers must be semi-tranparent:
-        this.trace.context.globalAlpha = 0.3;
-        this.model.context.globalAlpha = 0.6;
+        this.getLayer("trace").context.globalAlpha = 0.3;
+        this.getLayer("model").context.globalAlpha = 0.6;
           
         // Decorate line styles for tarcing and modelling layers:
-        this.trace.context.setLineDash([1, 3]);
-        this.model.context.setLineDash([1, 2]);
+        this.getLayer("trace").context.setLineDash([1, 3]);
+        this.getLayer("model").context.setLineDash([1, 2]);
     }
 
     /**
      * Adds a new layer at the end of the list of Layers.
      * @param {Layer} layer 
+     * @param {uuid} id
      */
-    addLayer(layer) {
-        return this.layers.push(layer) - 1;
+    addLayer(layer, id) {
+        return this.#layers.set(id, layer);
     }
 
-    /**
-     * Insert a new layer into list of layers at position = Id. 
-     * @param {Layer} layer 
-     * @param {Number} id 
-     */
-    insertLayer(layer, id) {
-        this.layers.splice(id, 0, layer);
-    }
 
     /**
      * Removes the drawing layer by its Id.
-     * @param {Number} id 
+     * @param {uuid} id 
      */
     removeLayer(id) {
-        // TODO:
-        this.layer.splice(id, 1);
+        this.#layers.delete(id);
     }
 
     /**
      * Returns the drawing layer by its Id.
-     * @param {Number} id index of the layer to get
+     * @param {uuid} id index of the layer to get
      */
     getLayer(id) {
-        return this.layers[id];
+        return this.#layers.get(id);
     }
 
     /**
@@ -89,24 +78,34 @@ export default class Stage extends Subject {
      * @param {Boolean} keepShapes do we need to keep shapes in memory?
      */
     clear(keepShapes) {
-        this.main.clear(keepShapes);
-        this.model.clear();
+        /**
+         * convert Map into array, filter its recodrs and then convert result back to Map
+         */
+        new Map(
+            [...this.#layers].filter(([k, v]) => !["trace", "model"].includes(k))
+        ).forEach((layer, key, map) => {
+            layer.clear(keepShapes);
+        });
     }
         
     /**
      * Full reset and clear of the stage.
      */
     clearAndReset() {
-        this.main.clearAndReset();
-        this.model.clearAndReset();
+        new Map(
+            [...this.#layers].filter(([k, v]) => !["trace", "model"].includes(k))
+        ).forEach((layer, key, map) => {
+            layer.clearAndReset();
+        });
+
         this.init();
     }
 
     zoomIn(event) {
         this.zoomFactor += this.zoomStep;
         let props = {
-            x: (event.mousOver) ? event.x - this.stageOffset.x: this.trace.canvas.width / 2,
-            y: (event.mousOver) ? event.y - this.stageOffset.y: this.trace.canvas.height / 2,
+            x: (event.mousOver) ? event.x - this.stageOffset.x: this.getLayer("trace").canvas.width / 2,
+            y: (event.mousOver) ? event.y - this.stageOffset.y: this.getLayer("trace").canvas.height / 2,
             zoom: this.zoomFactor.toFixed(1)
         };
 
@@ -118,7 +117,19 @@ export default class Stage extends Subject {
             y: this.stageOffset.y + this.zoomOffset.y
         };
         
-        this.main.setZoomFactor(props);
+        /**
+         * Instead of applying new Zoom Factor to only "main" layer 
+         * as it used to be in the prev versions, 
+         * this.getLayer("main").setZoomFactor(props);
+         * 
+         * now, we are going to apply it to all layers created by user and main as well.
+         */
+        
+        new Map(
+            [...this.#layers].filter(([k, v]) => !["trace", "model"].includes(k))
+        ).forEach((layer, key, map) => {
+            layer.setZoomFactor(props);
+        });
 
         this.notifyAll({
             offset: {
@@ -132,8 +143,8 @@ export default class Stage extends Subject {
         if (this.zoomFactor > (2 * this.zoomStep)) {
             this.zoomFactor -= this.zoomStep;
             let props = {
-                x: (event.mousOver) ? event.x - this.stageOffset.x: this.trace.canvas.width / 2,
-                y: (event.mousOver) ? event.y - this.stageOffset.y: this.trace.canvas.height / 2,
+                x: (event.mousOver) ? event.x - this.stageOffset.x: this.getLayer("trace").canvas.width / 2,
+                y: (event.mousOver) ? event.y - this.stageOffset.y: this.getLayer("trace").canvas.height / 2,
                 zoom: this.zoomFactor.toFixed(1)
             };
     
@@ -145,7 +156,15 @@ export default class Stage extends Subject {
                 y: this.stageOffset.y + this.zoomOffset.y
             };
 
-            this.main.setZoomFactor(props);
+            /**
+             * Same as Zoom in
+             * this.getLayer("main").setZoomFactor(props);
+             */
+            new Map(
+                [...this.#layers].filter(([k, v]) => !["trace", "model"].includes(k))
+            ).forEach((layer, key, map) => {
+                layer.setZoomFactor(props);
+            });
 
             this.notifyAll({
                 offset: {
@@ -165,10 +184,19 @@ export default class Stage extends Subject {
         this.stageOffset.x += x;
         this.stageOffset.y += y;
 
-        this.main.drag(
-            this.stageOffset.x + this.zoomOffset.x, 
-            this.stageOffset.y + this.zoomOffset.y
-        );
+        // same as Zoom above:
+        // this.getLayer("main").drag(
+        //     this.stageOffset.x + this.zoomOffset.x, 
+        //     this.stageOffset.y + this.zoomOffset.y
+        // );
+
+        new Map(
+            [...this.#layers].filter(([k, v]) => !["trace", "model"].includes(k))
+        ).forEach((layer, key, map) => {
+            layer.drag(
+                this.stageOffset.x + this.zoomOffset.x, 
+                this.stageOffset.y + this.zoomOffset.y);
+        });
         
         this.notifyAll({
             offset: {
@@ -183,8 +211,12 @@ export default class Stage extends Subject {
      */
     center() {
         this.drag(
-            -1 * (this.stageOffset.x + this.zoomOffset.x) + this.trace.canvas.width * ( 1- this.zoomFactor) / 2, 
-            -1 * (this.stageOffset.y + this.zoomOffset.y) + this.trace.canvas.height * ( 1- this.zoomFactor) / 2
+            
+            -1 * (this.stageOffset.x + this.zoomOffset.x)
+                + this.getLayer("trace").canvas.width * ( 1- this.zoomFactor) / 2, 
+            
+            -1 * (this.stageOffset.y + this.zoomOffset.y) 
+                + this.getLayer("trace").canvas.height * ( 1- this.zoomFactor) / 2
         );
     }
 

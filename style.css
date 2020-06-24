@@ -159,8 +159,10 @@ button {
 #stage {
     position: relative;
     border: 1px solid lime;
-    width: 700px;
-    height: 500px;
+    width: 70vw;
+    height: 90vh;
+    min-width: 270px;
+    min-height: 450px;
 }
 
 #stage > canvas { 

@@ -15,8 +15,8 @@
 
 <body>
 
-<h1>Welcome to the Drawing App! (Latest Chrome or Firefox for Desktop PC are recommended).</h1>
-<div class= "container">
+    <h1>Welcome to the Drawing App! (Latest Chrome or Firefox for Desktop PC are recommended).</h1>
+    <div class= "container">
 
     <div class="color-container">
         <button class="btn btn-black" type="button"></button>
@@ -31,11 +31,8 @@
         <button class="btn btn-grey" type="button"></button>
     </div>
 
-    <div id="stage">
-        <canvas width="700" height="500" id="main"></canvas>
-        <canvas width="700" height="500" id="model"></canvas>
-        <canvas width="700" height="500" id="trace"></canvas>
-    </div>
+    <!-- "Stage" container: this is the place where cnavases will be added by Stage class. -->
+    <div id="stage"></div>
 
     <div class="toolbar-container">
         
@@ -131,25 +128,20 @@
      * In Chrome it is possible to use "Web Server for Chrome" extention, or
      * on VS Code - "Live Server" extention.
      */
-    import {Stage} from "./include/Stage.js";
+
+    import {App} from "./include/App.js";
     import {Display} from "./include/Display.js";
     import {Dispatcher} from "./include/Dispatcher.js";
-    import * as Shape from "./include/Shape.js";
+    
     
     $(document).ready( () => {
-        /**
-         * TODO:
-         * use Factory pattern here, or (probably) inside the Dispatcher
-         */
-        const stage = new Stage(
-            $("#stage").find("#main").get(0), 
-            $("#stage").find("#model").get(0), 
-            $("#stage").find("#trace").get(0));
 
-        const dispatcher = new Dispatcher(stage);
-
-        let shape = new Shape.AbstractShape();
-        let color = undefined;
+        const app = App.getInstance();
+        app.init($("#stage"));
+        
+        const dispatcher = new Dispatcher(app);
+        
+        let props = {};
 
         /**
          * Make this looking fancier.
@@ -170,8 +162,7 @@
                     if ($(event.target).attr("class") == $(button).attr("class")) {
                         $(button).css("width", "40px");
                         $(button).blur();
-                        color = $(button).css("background-color");
-                        shape.setColor(color);
+                        props.color = $(button).css("background-color");
                     } else {
                         $(button).css("width", "30px");
                     }
@@ -207,37 +198,35 @@
          * Event handlers for shape-buttons
          */
         $("#circle").on("click", (event) => {
-            shape = new Shape.Circle();
-            shape.setColor(color);
+            props.shape = "circle";
         });
 
         $("#ellipse").on("click", (event) => {
-            shape = new Shape.Ellipse();
-            shape.setColor(color);
+            props.shape = "ellipse";
         });
 
         $("#square").on("click", (event) => {
-            shape = new Shape.Rectangle();
-            shape.setColor(color);
+            props.shape = "rectangle"
         });
 
         $("#clear").on("click", (event) => {
-            stage.clearAndReset();
+            app.stage.clearAndReset();
         });
     
         /**
          * Trace the mouse pointer and process its "mousemove" and "click" events:
          */
         $("#trace").on("mousemove", (event) => {
-            dispatcher.dispatch(event, shape);
+            
+            dispatcher.dispatch(event, Object.assign({}, props));
         });
 
         $("#trace").on("click mousewheel", (event) => {
-            dispatcher.dispatch(event, shape);
+            dispatcher.dispatch(event, Object.assign({}, props));
         });
 
         $("#trace").on("mousedown mouseup mouseover mouseout", (event) => {
-            dispatcher.dispatch(event, shape);
+            dispatcher.dispatch(event, Object.assign({}, props));
         });
 
         /**
@@ -245,7 +234,7 @@
          */
         $(document).on("keyup", (event) => {
             if (event.key === "Escape") {
-                dispatcher.dispatch(event, shape);
+                dispatcher.dispatch(event, Object.assign({}, props));
             }
         });
 
@@ -253,27 +242,41 @@
          * Dragging with buttons:
          */
         $("#move-up").on("click", () => {
-            stage.drag(0, -50);
+            app.stage.drag(0, -50);
         });
 
         $("#move-down").on("click", () => {
-            stage.drag(0, 50);
+            app.stage.drag(0, 50);
         });
 
         $("#move-left").on("click", () => {
-            stage.drag(-50, 0);
+            app.stage.drag(-50, 0);
         });
 
         $("#move-right").on("click", () => {
-            stage.drag(50, 0);
+            app.stage.drag(50, 0);
         });
 
         $("#move-center").on("click", () => {
-             stage.center();
+             app.stage.center();
         });
 
+        $(window).resize(() => {
+            if ($("#stage").children().attr("width") != $("#stage").css("width")) {
+                $("#stage").children().attr("width", $("#stage").css("width"));
+            }
+
+            if ($("#stage").children().attr("height") != $("#stage").css("height")) {
+                $("#stage").children().attr("height", $("#stage").css("height"));
+            }
+
+            app.layer("trace").context.globalAlpha = 0.3;
+            app.layer("trace").context.setLineDash([1, 3]);
+            app.stage.drag(0, 0);
+        })
+
         /**
-         * create 2 Display objects and assign them for notifications from
+         * Two Display objects that assigned for notifications from
          * Stage and Dispatcher.MouseTracker.
          */
         let xyDisplay = new Display();
@@ -285,10 +288,10 @@
         zoDiplay.addKey("x", $("#offset").find("div.display").find("[name='x']").get(0));
         zoDiplay.addKey("y", $("#offset").find("div.display").find("[name='y']").get(0));
         zoDiplay.addKey("z", $("#zoom").find("div.display").find("[name='z']").get(0));
-        stage.addObserver(zoDiplay);
+        app.stage.addObserver(zoDiplay);
 
         /**
-         * This peice of code stands for testing purpose only.
+         * The below peice of code stands for testing purpose only.
          * It creates a hidden buttton which could be clicked virtually
          * by the code in browser's dev-tools console:
          * 
@@ -303,14 +306,15 @@
             "text": "Draw",
             "style": "display: none;",
             "click": function() {
-                    stage.clearAndReset();
-                    let rectangle = new Shape.Rectangle();
-                    let circle = new Shape.Circle();
-                    stage.main.draw(rectangle, {x:50, y:350, w:200, h: 100});
-                    stage.main.draw(circle, {x:150, y:400, r:2});
+                    app.stage.clearAndReset();
 
-                    stage.main.draw(circle, {x:600, y:100, r:80});
-                    stage.main.draw(circle, {x:600, y:100, r:2});
+                    app.layer("main").draw({shape: "rectangle", x:50, y:350, w:200, h: 100});
+                    app.layer("main").draw({shape: "circle", x:150, y:400, r:2});
+
+                    app.layer("main").draw({shape: "circle", x:600, y:100, r:80});
+                    app.layer("main").draw({shape: "circle", x:600, y:100, r:2});
+
+                    // app.layer("main").draw({shape: "rectangle", start: {x:50, y:350}, end: {x:250, y: 450}});
             }
         }).appendTo($(".actions").get(0));
 

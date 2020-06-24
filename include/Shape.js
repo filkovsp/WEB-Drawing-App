@@ -13,27 +13,9 @@
  */
 export default class AbstractShape {
     constructor() {
-        this.color = "rgb(0, 0, 0)";
-        this.fillColor = "rgb(0, 0, 0)";
+        // throw new Error("Do not instanciate abstract shape!");
     }
     
-    /**
-     * Interface to set Shape's line-color property
-     * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors
-     * @param {*} color 
-     */
-    setColor(color) {
-        this.color = color;
-    }
-
-    /**
-     * Interface to set Shape's fill-color property
-     * @param {*} color 
-     */
-    setFillColor(color) {
-        this.fillColor = color;
-    }
-
     /**
      * Method that validates
      * whether we receive in props just to points {start: {x, y}, end: {x, y}}
@@ -51,7 +33,16 @@ export default class AbstractShape {
             props.zoom = 1;
         }
 
-        return this.getPropsFromCoordinates(props);
+        if (!Object.keys(props).includes("color")) {
+            props.color = "rgb(0, 0, 0)";
+        }
+
+        if (Object.keys(props).includes("fillColor")) {
+            // set Context.FillColor to props.fillColor
+        } 
+
+        this.getPropsFromCoordinates(props)
+        return props;
     }
 
     /**
@@ -61,7 +52,7 @@ export default class AbstractShape {
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
     getPropsFromCoordinates({start, end}) {
-        throw new Error("implement this method in Child class");
+        throw new Error("implement this method in the Child class");
     }
 
     /**
@@ -103,23 +94,17 @@ class Circle extends AbstractShape {
      * @param {Object} props Object containing properties {x, y, r}
      */
     draw(layer, props) {
-        if(!["x", "y", "r"].every(key => Object.keys(props).includes(key))) {
-            props = this.validateProps(props);    
-        }
-
-        layer.context.strokeStyle = this.color;
+        this.validateProps(props);
+        layer.context.strokeStyle = props.color;
         layer.context.beginPath();
         layer.context.arc(props.x, props.y, props.r, 0, 2 * Math.PI);
         layer.context.closePath();
         layer.context.stroke();
+    }
 
-        /**
-         * once shape is drawn, we don't need 
-         * props {offset, zoom} any more.
-         */
-        delete props.offset;
-        delete props.zoom;
-        return props;
+    catch(props) {
+        // let 
+        return false;
     }
 
     /**
@@ -151,7 +136,12 @@ class Circle extends AbstractShape {
         props.x = (props.x - props.offset.x) / props.zoom;
         props.y = (props.y - props.offset.y) / props.zoom;
         props.r /= props.zoom;
-        return props;
+        /**
+         * once shape is drawn, we don't need 
+         * props {offset, zoom} any more.
+         */
+        delete props.offset;
+        delete props.zoom;
     }
 }
 
@@ -166,20 +156,12 @@ class Ellipse extends AbstractShape {
      * @param {Object} props Object containing properties {x, y, rX, rY, rA}
      */
     draw(layer, props) {
-        if(!["x", "y", "rX", "rY", "rA"].every(property => Object.keys(props).includes(property))) {
-            props = this.validateProps(props);    
-        }
-
-        layer.context.strokeStyle = this.color;
+        this.validateProps(props);
+        layer.context.strokeStyle = (props.color) ? props.color : this.color;
         layer.context.beginPath();
         layer.context.ellipse(props.x, props.y, props.rX, props.rY, props.rA, 0, 2 * Math.PI);
         layer.context.closePath();
         layer.context.stroke();
-        
-        // drop default properties.
-        delete props.offset;
-        delete props.zoom;
-        return props;
     }
     /**
      * Shape specific method that returns object of properties required by shape to draw
@@ -208,13 +190,17 @@ class Ellipse extends AbstractShape {
             
             delete props.start;
             delete props.end;
+
+            props.x = (props.x - props.offset.x) / props.zoom;
+            props.y = (props.y - props.offset.y) / props.zoom;
+            props.rX /= props.zoom;
+            props.rY /= props.zoom;
+            
+            delete props.offset;
+            delete props.zoom;
         }
 
-        props.x = (props.x - props.offset.x) / props.zoom;
-        props.y = (props.y - props.offset.y) / props.zoom;
-        props.rX /= props.zoom;
-        props.rY /= props.zoom;
-        return props;
+        // return props;
     }
 }
 
@@ -235,12 +221,10 @@ class Rectangle extends AbstractShape {
          * refer fo Context-API:
          * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeRect
          */
-        if(!["x", "y", "w", "h"].every(key => Object.keys(props).includes(key))) {
-            props = this.validateProps(props);
-        }
-
-        layer.context.strokeStyle = this.color;
+        this.validateProps(props);
+        layer.context.strokeStyle = (props.color) ? props.color : this.color;
         layer.context.beginPath();
+        // TODO: change it to context.strokeRect() method
         layer.context.moveTo(props.x, props.y);
         layer.context.lineTo(props.x + props.w, props.y);
         layer.context.lineTo(props.x + props.w, props.y + props.h);
@@ -248,10 +232,6 @@ class Rectangle extends AbstractShape {
         layer.context.lineTo(props.x, props.y);
         layer.context.closePath();
         layer.context.stroke();
-
-        delete props.offset;
-        delete props.zoom;
-        return props;
     }
 
     /**
@@ -267,14 +247,16 @@ class Rectangle extends AbstractShape {
             props.h = props.end.y - props.start.y;   
             
             delete props.start;
-            delete props.end;        
+            delete props.end;
         }
 
         props.x = (props.x - props.offset.x) / props.zoom;
         props.y = (props.y - props.offset.y) / props.zoom;
         props.w /= props.zoom;
         props.h /= props.zoom;
-        return props;
+        
+        delete props.offset;
+        delete props.zoom;
     }
 }
 
@@ -324,9 +306,8 @@ class Trace extends AbstractShape {
      * @param {Object} props Object containing properties {x, y}
      */
     draw(layer, props) {
-        if(!["x", "y"].every(key => Object.keys(props).includes(key))) {
-            props = this.validateProps(props);
-        }
+        this.validateProps(props);
+        layer.context.strokeStyle = (props.color) ? props.color : "rgb(0, 0, 0)";
         layer.context.beginPath();
         layer.context.strokeStyle = this.color;
         layer.context.moveTo(props.x, 0);
@@ -334,11 +315,6 @@ class Trace extends AbstractShape {
         layer.context.moveTo(0, props.y);
         layer.context.lineTo(layer.canvas.width, props.y);
         layer.context.stroke();
-        
-        // drop default properties.
-        delete props.offset;
-        delete props.zoom;
-        return props;
     }
     
     /**
@@ -354,9 +330,10 @@ class Trace extends AbstractShape {
             delete props.start;
             delete props.end;        
         }
-        return props;
+        delete props.offset;
+        delete props.zoom;
     }
 }
 
-export {AbstractShape, Circle, Rectangle, Ellipse};
-export {Grid, Trace};
+export {AbstractShape, Circle, Rectangle, Ellipse, Trace};
+export {Grid};

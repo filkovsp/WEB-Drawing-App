@@ -3,43 +3,49 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
  * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
  */
+import {App} from "./App.js";
 
 export default class Layer {
+    #app;
     constructor(canvas) {
+        this.#app = App.getInstance();
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
-        this.shapes = Array();        
+        this.shapes = Array();       
         this.zoomFactor = 1;
         this.offset = {x: 0, y: 0};
     }
-
+    
     /**
      * Draws the shape at coordinastes as provided - this is exact location at the canvas.
      * Returns properties with offset applied to (x, y) position.s
-     * @param {Shape} shape 
      * @param {Object} props 
      */
-     sketch(shape, props) {
-        return shape.draw(this, props);
+    sketch(props) {
+        return this.#app
+            .shape(props.shape)
+            .draw(this, props);
     }
 
     /**
      * Draws a new shape on the canvas, and adds it into the list of "registered shapes",
      * with current offset applied to its (x, y) coordinates by shape.validateProps(props).
-     * @param {Shape} shape Shape to draw
      * @param {Object} props 
      */
-    draw(shape, props) {
-        
+    draw(props) {
         props.offset = {x: 0, y: 0};
         props.zoom = 1;
-        props = this.sketch(shape, props);
+        this.sketch(props);
         
         props.offset = this.offset; 
         props.zoom = this.zoomFactor;
-        props = shape.validateProps(props);
+        props.id = App.constructor.uuid();
         
-        this.shapes.push({shape: shape.clone(), props: props});
+        this.#app
+            .shape(props.shape)
+            .validateProps(props);
+        
+        this.shapes.push(props);
     }
     
     setZoomFactor(props) {
@@ -57,8 +63,8 @@ export default class Layer {
         
         this.context.setTransform(matrix);
         
-        this.shapes.forEach(el => {
-            this.sketch(el.shape, el.props);
+        this.shapes.forEach(props => {
+            this.sketch(props);
         }, this);
 
         this.context.restore();
@@ -84,8 +90,8 @@ export default class Layer {
         
         this.context.setTransform(matrix);
         
-        this.shapes.forEach(el => {
-            this.sketch(el.shape, el.props);
+        this.shapes.forEach(props => {
+            this.sketch(props);
         }, this);
 
         this.context.restore();
