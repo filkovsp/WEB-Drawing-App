@@ -13,8 +13,7 @@
 import {MouseTracker} from "./MouseTracker.js";
 import {Subject} from "./Observer.js";
 
-export default class Dispatcher extends Subject{
-    #tracer;
+export default class Dispatcher extends Subject {
     #app;
 
     constructor(app) {

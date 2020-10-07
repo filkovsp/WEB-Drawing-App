@@ -68,7 +68,15 @@ button {
     border-radius:50px/50px;
     border-top-left-radius: 10px;
     border-bottom-right-radius : 10px;
-    border-start-end-radius: 50px;
+    
+}
+
+.btn-line {
+    background-color: #000;
+	border-top: 14px solid #ccc;
+    border-bottom: 14px solid #ccc;
+	border-right: 0px;
+    border-left: 0px;
 }
 
 .btn-square {
@@ -86,22 +94,23 @@ button {
 }
 
 .color-container {
-    width: 50px;
+    width: 3em;
     display: flex;
     flex-direction: column;
 }
 
 .toolbar-container, .actions {
-    width: 100px;
+    width: 8em;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: start;
     align-items: center;
 }
 
 .shapes {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .display-container {
@@ -109,8 +118,15 @@ button {
     flex-direction: column;
 }
 
-.display-container > div {
+fieldset.display-container {
+    width: 5em;
+    border: 1px solid #a3cad3;
+}
+
+.display-container > div,
+.display-container > legend {
     font-size: small;
+    text-align: center;
 }
 
 .display-container > .display {
@@ -127,11 +143,12 @@ button {
 }
 
 .display-container > .display > .value {
-    width: 45px; 
+    width: 35px; 
     border-radius: 3px;
     border: 1px solid #a0a0a0; 
     font-size: 0.9em;
     padding: 2px;
+    text-align: right;
 }
 
 .move-controls {
@@ -162,7 +179,7 @@ button {
     width: 70vw;
     height: 90vh;
     min-width: 270px;
-    min-height: 450px;
+    min-height: 500px;
 }
 
 #stage > canvas { 

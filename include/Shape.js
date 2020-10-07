@@ -21,7 +21,7 @@ export default class AbstractShape {
      * whether we receive in props just to points {start: {x, y}, end: {x, y}}
      * or, this is shape-speciwic params for drawing particular shape.
      * I you use this method in CHild class, then make sure you implement also
-     * getPropsFromCoordinates() in the same class.
+     * enrichProps() in the same class.
      * @param {*} props 
      */
     validateProps(props) {
@@ -41,7 +41,7 @@ export default class AbstractShape {
             // set Context.FillColor to props.fillColor
         } 
 
-        this.getPropsFromCoordinates(props)
+        this.enrichProps(props)
         return props;
     }
 
@@ -51,7 +51,7 @@ export default class AbstractShape {
      * starting and ending points.
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
-    getPropsFromCoordinates({start, end}) {
+    enrichProps({start, end}) {
         throw new Error("implement this method in the Child class");
     }
 
@@ -102,9 +102,8 @@ class Circle extends AbstractShape {
         layer.context.stroke();
     }
 
-    catch(props) {
-        // let 
-        return false;
+    catch(props, click) {
+        return Math.sqrt(Math.pow(props.x - click.x) + Math.pow(props.y - click.y)) <= props.r;
     }
 
     /**
@@ -112,7 +111,7 @@ class Circle extends AbstractShape {
      * out of two coordinates at the layer: starting and ending points.
      * @param {Object} props {start: {x, y}, end: {x, y}}
      */
-    getPropsFromCoordinates (props) {
+    enrichProps (props) {
         if(["start", "end"].every(key => Object.keys(props).includes(key))) {
             props.x = props.start.x;
             props.y = props.start.y;
@@ -168,10 +167,10 @@ class Ellipse extends AbstractShape {
      * out of two coordinates at the layer: starting and ending points.
      * @param {Object} coordinates {start: {x, y}, end: {x, y}}
      */
-    getPropsFromCoordinates(props) {
+    enrichProps(props) {
         if(["start", "end"].every(key => Object.keys(props).includes(key))) {
             /**
-             * TODO: rework this functio to make it calculating props more properly.
+             * TODO: rework this function to make it calculating props more properly.
              */
             let hyp = Math.sqrt(
                 Math.pow(props.end.x - props.start.x, 2) + 
@@ -239,7 +238,52 @@ class Rectangle extends AbstractShape {
      * Returns object with shape-specific coordinates: {x, y, w, h}
      * @param {Object} props 
      */
-    getPropsFromCoordinates(props) {
+    enrichProps(props) {
+        if(["start", "end"].every(key => Object.keys(props).includes(key))) {
+            props.x = props.start.x;
+            props.y = props.start.y;
+            props.w = props.end.x - props.start.x;
+            props.h = props.end.y - props.start.y;   
+            
+            delete props.start;
+            delete props.end;
+        }
+
+        props.x = (props.x - props.offset.x) / props.zoom;
+        props.y = (props.y - props.offset.y) / props.zoom;
+        props.w /= props.zoom;
+        props.h /= props.zoom;
+        
+        delete props.offset;
+        delete props.zoom;
+    }
+}
+
+class Line extends AbstractShape {
+    constructor() {
+        super();
+    }
+
+    /**
+     * Draws Line, starting at props{x, y}, and ending at props{x + w, y + h}
+     * @param {Layer} layer layer object, where the shape must be drawn
+     * @param {Object} props Object containing properties {x, y, w, h}
+     */
+    draw(layer, props) {
+        this.validateProps(props);
+        layer.context.strokeStyle = (props.color) ? props.color : this.color;
+        layer.context.beginPath();
+        layer.context.moveTo(props.x, props.y);
+        layer.context.lineTo(props.x + props.w, props.y + props.h);
+        layer.context.stroke();
+    }
+
+    /**
+     * Gets object `props` with two fields in it (objects): start{x, y} & end{x, y}
+     * Returns object with shape-specific coordinates: {x, y, w, h}
+     * @param {Object} props 
+     */
+    enrichProps(props) {
         if(["start", "end"].every(key => Object.keys(props).includes(key))) {
             props.x = props.start.x;
             props.y = props.start.y;
@@ -322,7 +366,7 @@ class Trace extends AbstractShape {
      * Returns object with shape-specific coordinates: {x, y}
      * @param {Object} props 
      */
-    getPropsFromCoordinates(props) {
+    enrichProps(props) {
         if(["start"].every(key => Object.keys(props).includes(key))) {
             props.x = props.start.x;
             props.y = props.start.y;
@@ -335,5 +379,5 @@ class Trace extends AbstractShape {
     }
 }
 
-export {AbstractShape, Circle, Rectangle, Ellipse, Trace};
+export {AbstractShape, Circle, Rectangle, Ellipse, Trace, Line};
 export {Grid};

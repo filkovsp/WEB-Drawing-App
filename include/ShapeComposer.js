@@ -8,6 +8,7 @@ export default class ShapeComposer {
     static compose() {
         let shapes = new Map()
             .set("tracer", new Shape.Trace())
+            .set("line", new Shape.Line())
             .set("circle", new Shape.Circle())
             .set("rectangle", new Shape.Rectangle())
             .set("ellipse", new Shape.Ellipse());
